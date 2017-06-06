@@ -15,6 +15,9 @@ public:
     explicit LibrarianGUI(QWidget *parent = 0);
     ~LibrarianGUI();
 
+private slots:
+    void on_themSachButton_clicked();
+
 private:
     Ui::LibrarianGUI *ui;
 };

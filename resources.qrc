@@ -1,1 +1,11 @@
-<RCC/>
+<RCC>
+    <qresource prefix="/">
+        <file>media/images/0.jpg</file>
+        <file>media/images/014242417X.jpg</file>
+        <file>media/images/098478280X.jpg</file>
+        <file>media/images/0262033844.jpg</file>
+        <file>media/images/1848000693.jpg</file>
+        <file>libpro.db</file>
+        <file>media/images/logo.png</file>
+    </qresource>
+</RCC>
