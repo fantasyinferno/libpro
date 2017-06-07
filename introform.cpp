@@ -10,12 +10,14 @@
 #include "readergui.h"
 
 IntroForm::IntroForm(QWidget *parent) :
-    QWidget(parent),
+    QDialog(parent),
     ui(new Ui::IntroForm)
 {
     ui->setupUi(this);
-    if (parent)
+    if (parent) {
         db = dynamic_cast<ReaderGUI*>(parent)->getDatabase();
+    }
+
 }
 
 IntroForm::~IntroForm()
@@ -59,8 +61,7 @@ void IntroForm::on_pushButton_clicked()
 
 void IntroForm::setTab(int i)
 {
-    this->ui->tabWidget->setTabEnabled(i,1);
-    this->ui->tabWidget->setTabEnabled(1-i,0);
+    ui->tabWidget->setCurrentIndex(i);
 }
 
 //Sửa đường dẫn

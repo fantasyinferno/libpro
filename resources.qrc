@@ -7,5 +7,6 @@
         <file>media/images/1848000693.jpg</file>
         <file>libpro.db</file>
         <file>media/images/logo.png</file>
+        <file>media/icons/search_bar.png</file>
     </qresource>
 </RCC>

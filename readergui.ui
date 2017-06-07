@@ -14,21 +14,14 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: #343a40;
-color: white;</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_7">
-    <item>
-     <widget class="QFrame" name="frame">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-     </widget>
-    </item>
+   <property name="styleSheet">
+    <string notr="true">background-color: #343a40;
+color: white;</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <layout class="QHBoxLayout" name="header">
       <item>
@@ -71,9 +64,15 @@ color: white;</string>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QLabel" name="username">
+          <widget class="QPushButton" name="username">
+           <property name="styleSheet">
+            <string notr="true">color: white;</string>
+           </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -450,26 +449,68 @@ font: 12pt &quot;Tahoma&quot;;</string>
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="footer">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QLineEdit" name="thanhTimKiem">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>30</height>
-         </size>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <property name="spacing">
+         <number>0</number>
         </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius: 5px;
+        <item>
+         <widget class="QLineEdit" name="thanhTimKiem">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">border-top-left-radius: 5px;
+border-bottom-left-radius: 5px;
 border-style: outset;
-border-width: 1px;
 border-color: rgb(72, 72, 72);
-background-color: #f8f9fa;</string>
-        </property>
-        <property name="placeholderText">
-         <string>Tìm sách</string>
-        </property>
-       </widget>
+background-color: #f8f9fa;
+color: black;</string>
+          </property>
+          <property name="placeholderText">
+           <string>Tìm sách</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="timKiemButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">border-top-right-radius: 5px;
+border-bottom-right-radius: 5px;
+border-style: outset;
+border-color: rgb(72, 72, 72);
+background-color: #f8f9fa;
+color: red;</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/media/icons/search_bar.png</normaloff>:/media/icons/search_bar.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>20</width>
+            <height>25</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QTableView" name="danhMucSach">
@@ -496,7 +537,7 @@ color: black;</string>
          <bool>true</bool>
         </property>
         <attribute name="horizontalHeaderVisible">
-         <bool>true</bool>
+         <bool>false</bool>
         </attribute>
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>true</bool>
@@ -531,6 +572,23 @@ color: black;</string>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <tabstops>
+  <tabstop>thanhTimKiem</tabstop>
+  <tabstop>timKiemButton</tabstop>
+  <tabstop>muonButton</tabstop>
+  <tabstop>dangXuatButton</tabstop>
+  <tabstop>dangNhapButton</tabstop>
+  <tabstop>dangKyButton</tabstop>
+  <tabstop>danhMucSach</tabstop>
+  <tabstop>tuaDe</tabstop>
+  <tabstop>tacGia</tabstop>
+  <tabstop>namSanXuat</tabstop>
+  <tabstop>theLoai</tabstop>
+  <tabstop>maSach</tabstop>
+  <tabstop>noiDungSach</tabstop>
+ </tabstops>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

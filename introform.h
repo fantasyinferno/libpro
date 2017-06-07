@@ -1,7 +1,7 @@
 #ifndef INTROFORM_H
 #define INTROFORM_H
 
-#include <QWidget>
+#include <QDialog>
 #include <QSqlTableModel>
 #include <QSqlQueryModel>
 #include <QItemSelection>
@@ -11,7 +11,7 @@ namespace Ui {
 class IntroForm;
 }
 
-class IntroForm : public QWidget
+class IntroForm : public QDialog
 {
     Q_OBJECT
 

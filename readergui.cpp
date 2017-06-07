@@ -38,8 +38,10 @@ void ReaderGUI::on_selectionChanged(const QItemSelection & selected, const QItem
 void ReaderGUI::on_thanhTimKiem_returnPressed()
 {
     QString keyword = ui->thanhTimKiem->text();
-    QString queryString = QString("book MATCH 'title:%1 OR author:%1 OR description:%1 OR book_id:%1'").arg(keyword);
-    model->setFilter(queryString);
+    if (!keyword.isEmpty()) {
+        QString queryString = QString("book MATCH 'title:%1 OR author:%1 OR description:%1 OR book_id:%1'").arg(keyword);
+        model->setFilter(queryString);
+    }
 }
 
 
@@ -81,11 +83,6 @@ void ReaderGUI::initializeTable()
     ui->danhMucSach->setColumnWidth(2, 400);
     ui->danhMucSach->setColumnWidth(3, 400);
     ui->danhMucSach->setColumnHidden(6, true);
-//    for (int i = 0; i != model->rowCount(); ++i) {
-//        QPushButton *muonButton = new QPushButton(tr("Mượn"));
-//        QObject::connect(muonButton, SIGNAL(clicked()), this, SLOT(on_muon()));
-//        ui->danhMucSach->setIndexWidget(model->index(i, 8), muonButton);
-//    }
     QObject::connect(ui->danhMucSach->selectionModel(), SIGNAL(selectionChanged( const QItemSelection &, const QItemSelection &)), SLOT(on_selectionChanged(const QItemSelection &, const QItemSelection &)));
     QDataWidgetMapper *mapper = new QDataWidgetMapper(this);
     mapper->setModel(model);
@@ -113,10 +110,21 @@ void ReaderGUI::initializeGUILogic() {
     initializeTable();
     initializeQuotes();
     introForm = new IntroForm(this);
+    introForm->setWindowTitle("Đăng nhập/Đăng ký");
+    information = new Information(this);
+    information->setWindowTitle("Thông tin cá nhân");
+    connect(introForm, SIGNAL(dangNhapThanhCong(QString)), this, SLOT(on_dangNhapThanhCong(QString)));
+    connect(ui->timKiemButton, SIGNAL(clicked()), this, SLOT(on_thanhTimKiem_returnPressed()));
+    ui->dangXuatButton->hide();
 }
 
 void ReaderGUI::on_dangXuatButton_clicked()
 {
+    user = "";
+    ui->username->setText("");
+    ui->dangXuatButton->hide();
+    ui->dangKyButton->show();
+    ui->dangNhapButton->show();
 }
 
 void ReaderGUI::on_dangNhapButton_clicked()
@@ -129,4 +137,17 @@ void ReaderGUI::on_dangKyButton_clicked()
 {
     introForm->setTab(1);
     introForm->show();
+}
+
+void ReaderGUI::on_dangNhapThanhCong(QString u) {
+    user = u;
+    ui->dangKyButton->hide();
+    ui->dangNhapButton->hide();
+    ui->dangXuatButton->show();
+    ui->username->setText(user);
+}
+
+void ReaderGUI::on_username_clicked()
+{
+    information->show();
 }

@@ -1,7 +1,7 @@
 #ifndef INFORMATION_H
 #define INFORMATION_H
 
-#include <QWidget>
+#include <QDialog>
 #include <QSqlTableModel>
 #include <QSqlQueryModel>
 #include <QItemSelection>
@@ -11,7 +11,7 @@ namespace Ui {
 class Information;
 }
 
-class Information : public QWidget
+class Information : public QDialog
 {
     Q_OBJECT
 

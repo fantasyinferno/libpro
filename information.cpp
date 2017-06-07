@@ -9,7 +9,7 @@
 #include <QDebug>
 
 Information::Information(QWidget *parent) :
-    QWidget(parent),
+    QDialog(parent),
     ui(new Ui::Information)
 {
     ui->setupUi(this);
