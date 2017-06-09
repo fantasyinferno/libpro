@@ -143,9 +143,7 @@ void Information::submitVt()
 void Information::on_hoanTatButton_clicked()
 {
     enableEdit(false);
-    if (mapper->submit())
-        qDebug() << "haha";
-    else qDebug() << model->lastError();
+    mapper->submit();
     submitVt();
 }
 
@@ -171,30 +169,32 @@ void Information::on_thayDoiButton_clicked()
     enableEdit();
 }
 void Information::on_dangNhapThanhCong(QString username) {
-    model = new QSqlRelationalTableModel(0, db);
     tdn = username;
     ui->username->setText(tdn);
+    model = new QSqlRelationalTableModel(0, db);
     model->setTable("account");
-    model->setRelation(model->fieldIndex("gender_id"), QSqlRelation("gender", "gender_id", "gender"));
-    model->setRelation(model->fieldIndex("status_id"), QSqlRelation("status", "status_id", "status"));
-    QSqlTableModel *relModelGender = model->relationModel(model->fieldIndex("gender_id"));
-    QSqlTableModel *relModelStatus = model->relationModel(model->fieldIndex("status_id"));
+    int genderIdx = model->fieldIndex("gender_id");
+    int statusIdx = model->fieldIndex("status_id");
+    model->setRelation(genderIdx, QSqlRelation("gender", "gender_id", "gender"));
+    model->setRelation(statusIdx, QSqlRelation("status", "status_id", "status"));
+    model->setFilter("account = '" + tdn + "'");
+    model->select();
+
+    QSqlTableModel *relModelGender = model->relationModel(genderIdx);
+    QSqlTableModel *relModelStatus = model->relationModel(statusIdx);
     ui->ip_gt->setModel(relModelGender);
     ui->ip_gt->setModelColumn(relModelGender->fieldIndex("gender"));
     ui->ip_tt->setModel(relModelStatus);
     ui->ip_tt->setModelColumn(relModelStatus->fieldIndex("status"));
-    model->setFilter("account = '" + username + "'");
-    model->select();
     mapper = new QDataWidgetMapper(this);
     mapper->setModel(model);
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
     mapper->setItemDelegate(new QSqlRelationalDelegate(this));
     mapper->addMapping(ui->ip_mk, model->fieldIndex("password"));
-    // Không submit được combobox
-    //mapper->addMapping(ui->ip_tt, model->fieldIndex("status_id"));
+    mapper->addMapping(ui->ip_tt, statusIdx);
     mapper->addMapping(ui->ip_hvt, model->fieldIndex("fullname"));
     mapper->addMapping(ui->ip_cmnd, model->fieldIndex("identity_number"));
-    //mapper->addMapping(ui->ip_gt, model->fieldIndex("gender_id"));
+    mapper->addMapping(ui->ip_gt, genderIdx);
     mapper->addMapping(ui->ip_nn, model->fieldIndex("job"));
     mapper->addMapping(ui->ip_em, model->fieldIndex("email"));
     mapper->addMapping(ui->ip_ns, model->fieldIndex("birthdate"));
