@@ -25,11 +25,8 @@ IntroForm::~IntroForm()
 {
     delete ui;
 }
-//Sửa đường dẫn
 void IntroForm::on_pushButton_clicked()
 {
-   // this->hide();
-
     QString tdn=ui->dn_tdn->text();
     QString mk=ui->dn_mk->text();
 
@@ -62,8 +59,7 @@ void IntroForm::setTab(int i)
     ui->tabWidget->setCurrentIndex(i);
 }
 
-//Sửa đường dẫn
-void IntroForm::on_pushButton_3_clicked()
+void IntroForm::on_dangKyButton_clicked()
 {
 
 
@@ -100,27 +96,37 @@ void IntroForm::on_pushButton_3_clicked()
         return;
     }
 
-    query2.prepare("insert into role values(:tdn, :vt);");
-    query2.bindValue(":tdn",ui->dk_tdn->text());
-    query2.bindValue(":vt","reader");
-    query2.exec();
-
     QSqlQuery query(0,db);
-    query.prepare("insert into account values(null, :tdn, :mk, :tt, :hvt, :cmnd, :gt, :ns, :cv, :em);");
+    query.prepare("insert into account(account, password, status_id, fullname, identity_number, gender_id, birthdate, email, job) values(:tdn, :mk, :tt, :hvt, :cmnd, :gt, :ns, :em, :cv);");
 
     query.bindValue(":tdn",ui->dk_tdn->text());
     query.bindValue(":mk",ui->dk_mk->text());
     query.bindValue(":tt",1);
     query.bindValue(":hvt",(ui->dk_hvt->text()!=""? ui->dk_hvt->text() : NULL));
     query.bindValue(":cmnd",(ui->dk_cmnd->text()!=""? ui->dk_cmnd->text() : NULL));
-    query.bindValue(":gt",(ui->dk_gt_nam->isChecked()? "Nam": "Nữ"));
-    query.bindValue(":ns",ui->dk_ns_ngay->text()+"/"+ui->dk_ns_thang->text()+"/"+ui->dk_ns_nam->text());
+    query.bindValue(":gt",(ui->dk_gt_nam->isChecked()? "1": "2"));
+    query.bindValue(":ns", ui->dk_ns->date());
     query.bindValue(":cv",(ui->dk_cv->text()!=""? ui->dk_cv->text() : NULL));
     query.bindValue(":em",(ui->dk_em->text()!=""? ui->dk_em->text() : NULL));
-
-    bool written = query.exec();
-
-    if(written){
+    bool ok = query.exec();
+    int id = query.lastInsertId().toInt();
+    query.prepare("INSERT INTO account_role VALUES (?, ?)");
+    if (ui->dk_vt_reader->isChecked()) {
+        query.addBindValue(id);
+        query.addBindValue(1);
+        ok &= query.exec();
+    }
+    if (ui->dk_vt_librarian->isChecked()) {
+        query.addBindValue(id);
+        query.addBindValue(2);
+        ok &= query.exec();
+    }
+    if (ui->dk_vt_manager->isChecked()) {
+        query.addBindValue(id);
+        query.addBindValue(3);
+        ok &= query.exec();
+    }
+    if(ok){
         QMessageBox::about(this,"Đăng ký thành công","Đăng ký tài khoản thành công");
         this->close();
         emit dangNhapThanhCong(ui->dk_tdn->text());
@@ -128,7 +134,4 @@ void IntroForm::on_pushButton_3_clicked()
     else{
         QMessageBox::about(this,"Lỗi","Không tạo được tài khoản");
     }
-
-
-    db.close();
 }
