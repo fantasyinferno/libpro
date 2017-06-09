@@ -83,6 +83,7 @@ void ReaderGUI::initializeTable()
     ui->danhMucSach->setModel(model);
     ui->danhMucSach->setItemDelegate(bd);
     ui->danhMucSach->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->danhMucSach->horizontalHeader()->setVisible(true);
     ui->danhMucSach->setColumnWidth(1, 60);
     ui->danhMucSach->setColumnWidth(2, 400);
     ui->danhMucSach->setColumnWidth(3, 400);
