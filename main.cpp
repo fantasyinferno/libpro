@@ -4,11 +4,14 @@
 #include <QSqlDatabase>
 #include <QDir>
 #include "librariangui.h"
+#include "managergui.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     ReaderGUI readerGUI;
     LibrarianGUI librarianGUI;
+    ManagerGUI managerGUI;
+    //managerGUI.show();
     readerGUI.show();
     QIcon icon(":/media/images/logo.png");
     a.setWindowIcon(icon);

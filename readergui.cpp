@@ -5,6 +5,7 @@
 #include <QDataWidgetMapper>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <iostream>
 ReaderGUI::ReaderGUI(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ReaderGUI)
@@ -19,6 +20,9 @@ ReaderGUI::~ReaderGUI()
 }
 QSqlDatabase ReaderGUI::getDatabase() {
     return db;
+}
+QString ReaderGUI::getUser() {
+    return user;
 }
 
 void ReaderGUI::on_selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
@@ -114,8 +118,10 @@ void ReaderGUI::initializeGUILogic() {
     information = new Information(this);
     information->setWindowTitle("Thông tin cá nhân");
     connect(introForm, SIGNAL(dangNhapThanhCong(QString)), this, SLOT(on_dangNhapThanhCong(QString)));
+    connect(introForm, SIGNAL(dangNhapThanhCong(QString)), information, SLOT(on_dangNhapThanhCong(QString)));
     connect(ui->timKiemButton, SIGNAL(clicked()), this, SLOT(on_thanhTimKiem_returnPressed()));
     ui->dangXuatButton->hide();
+    ui->username->setEnabled(false);
 }
 
 void ReaderGUI::on_dangXuatButton_clicked()
@@ -145,6 +151,7 @@ void ReaderGUI::on_dangNhapThanhCong(QString u) {
     ui->dangNhapButton->hide();
     ui->dangXuatButton->show();
     ui->username->setText(user);
+    ui->username->setEnabled(true);
 }
 
 void ReaderGUI::on_username_clicked()

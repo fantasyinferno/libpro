@@ -22,18 +22,19 @@ public:
     void initializeTable();
     void initializeQuotes();
     QSqlDatabase getDatabase();
+    QString getUser();
     ~ReaderGUI();
 
 private:
     Ui::ReaderGUI *ui;
     // Model thể hiện thông tin lấy từ cơ sở dữ liệu
     QSqlTableModel *model;
-    QString user;
     IntroForm *introForm;
     Information *information;
-protected:
-    // Cơ sở dữ liệu. Các lớp con có thể truy cập cơ sở dữ liệu này
+    // Cơ sở dữ liệu.
     QSqlDatabase db;
+    // Tên truy cập.
+    QString user;
 private slots:
     void on_selectionChanged(const QItemSelection &, const QItemSelection &);
     void on_thanhTimKiem_returnPressed();

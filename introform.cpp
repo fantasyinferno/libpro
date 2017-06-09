@@ -17,14 +17,14 @@ IntroForm::IntroForm(QWidget *parent) :
     if (parent) {
         db = dynamic_cast<ReaderGUI*>(parent)->getDatabase();
     }
-
+    ui->dn_tdn->setFocus();
+    ui->dk_tdn->setFocus();
 }
 
 IntroForm::~IntroForm()
 {
     delete ui;
 }
-
 //Sửa đường dẫn
 void IntroForm::on_pushButton_clicked()
 {
@@ -41,7 +41,6 @@ void IntroForm::on_pushButton_clicked()
 
     QSqlRecord rec=query.record();
     int nameCol=rec.indexOf("password");
-    qDebug()<<nameCol;
     if (!query.next())
         QMessageBox::critical(this,"Account Name Error!","No Account Name found!");
     else if (mk!=query.value(nameCol).toString())
@@ -50,7 +49,6 @@ void IntroForm::on_pushButton_clicked()
     {
         int nameCol_2=rec.indexOf("role_id");
         QString role=query.value(nameCol_2).toString();
-        qDebug()<<role;
         emit dangNhapThanhCong(tdn);
         ui->dn_mk->setText("");
         ui->dn_tdn->setText("");
