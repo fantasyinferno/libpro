@@ -205,10 +205,13 @@ void Information::on_dangNhapThanhCong(int id, QString username) {
     qDebug() << user_id;
     bookModel->setFilter(QString("account_id = %1").arg(user_id)); // SQL Injection Alert!
     bookModel->setRelation(bookModel->fieldIndex("book_id"), QSqlRelation("book", "book_id", "title"));
+    bookModel->setHeaderData(1, Qt::Horizontal, "Tựa đề");
+    bookModel->setHeaderData(2, Qt::Horizontal,  "Ngày mượn");
+    bookModel->setHeaderData(3, Qt::Horizontal, "Ngày hết hạn");
     bookModel->select();
     ui->sachDaMuon->setModel(bookModel);
     ui->sachDaMuon->setItemDelegate(new QSqlRelationalDelegate(this));
-    ui->sachDaMuon->setModelColumn(1);
+    ui->sachDaMuon->setColumnHidden(0, true);
 }
 
 void Information::on_huyButton_clicked()
