@@ -4,8 +4,11 @@
 #include "bookdelegate.h"
 #include <QDataWidgetMapper>
 #include <QSqlQuery>
+#include <qDebug>
+#include <QDate>
 #include <QSqlRecord>
-#include <iostream>
+#include <QSqlError>
+
 ReaderGUI::ReaderGUI(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ReaderGUI)
@@ -118,8 +121,9 @@ void ReaderGUI::initializeGUILogic() {
     introForm->setWindowTitle("Đăng nhập/Đăng ký");
     information = new Information(this);
     information->setWindowTitle("Thông tin cá nhân");
-    connect(introForm, SIGNAL(dangNhapThanhCong(QString)), this, SLOT(on_dangNhapThanhCong(QString)));
-    connect(introForm, SIGNAL(dangNhapThanhCong(QString)), information, SLOT(on_dangNhapThanhCong(QString)));
+    connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), this, SLOT(on_dangNhapThanhCong(int, QString)));
+    connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), information, SLOT(on_dangNhapThanhCong(int, QString)));
+    connect(this, SIGNAL(updateMyBooks(const QModelIndexList&)), information, SLOT(on_updateMyBooks(const QModelIndexList&)));
     connect(ui->timKiemButton, SIGNAL(clicked()), this, SLOT(on_thanhTimKiem_returnPressed()));
     ui->dangXuatButton->hide();
     ui->username->setEnabled(false);
@@ -146,8 +150,9 @@ void ReaderGUI::on_dangKyButton_clicked()
     introForm->show();
 }
 
-void ReaderGUI::on_dangNhapThanhCong(QString u) {
-    user = u;
+void ReaderGUI::on_dangNhapThanhCong(int id, QString username) {
+    user = username;
+    user_id = id;
     ui->dangKyButton->hide();
     ui->dangNhapButton->hide();
     ui->dangXuatButton->show();
@@ -158,4 +163,9 @@ void ReaderGUI::on_dangNhapThanhCong(QString u) {
 void ReaderGUI::on_username_clicked()
 {
     information->show();
+}
+
+void ReaderGUI::on_muonButton_clicked()
+{
+    emit updateMyBooks(ui->danhMucSach->selectionModel()->selectedRows());
 }

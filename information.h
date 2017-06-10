@@ -29,17 +29,18 @@ public:
 private slots:
     void on_hoanTatButton_clicked();
     void on_thayDoiButton_clicked();
-    void on_dangNhapThanhCong(QString);
-
+    void on_dangNhapThanhCong(int, QString);
+    void on_updateMyBooks(const QModelIndexList& selectedList);
     void on_huyButton_clicked();
 
 signals:
 private:
     QSqlDatabase db;
     Ui::Information *ui;
-    QString tdn;
-    QSqlRelationalTableModel *model;
+    QSqlRelationalTableModel *model, *bookModel;
     QDataWidgetMapper *mapper;
+    QString user;
+    int user_id;
 };
 
 #endif // INFORMATION_H

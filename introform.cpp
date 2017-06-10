@@ -36,17 +36,14 @@ void IntroForm::on_pushButton_clicked()
     query.bindValue(":tdn",tdn);
     query.exec();
 
-    QSqlRecord rec=query.record();
-    int nameCol=rec.indexOf("password");
     if (!query.next())
         QMessageBox::critical(this,"Account Name Error!","No Account Name found!");
-    else if (mk!=query.value(nameCol).toString())
+    else if (mk!=query.value("password").toString())
         QMessageBox::critical(this,"Password Error!","Wrong Password!");
     else
     {
-        int nameCol_2=rec.indexOf("role_id");
-        QString role=query.value(nameCol_2).toString();
-        emit dangNhapThanhCong(tdn);
+        int id = query.value("account_id").toInt();
+        emit dangNhapThanhCong(id, tdn);
         ui->dn_mk->setText("");
         ui->dn_tdn->setText("");
         this->close();
@@ -129,7 +126,7 @@ void IntroForm::on_dangKyButton_clicked()
     if(ok){
         QMessageBox::about(this,"Đăng ký thành công","Đăng ký tài khoản thành công");
         this->close();
-        emit dangNhapThanhCong(ui->dk_tdn->text());
+        emit dangNhapThanhCong(id, ui->dk_tdn->text());
     }
     else{
         QMessageBox::about(this,"Lỗi","Không tạo được tài khoản");

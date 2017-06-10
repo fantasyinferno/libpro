@@ -197,10 +197,7 @@ color: black;</string>
           <item>
            <widget class="QPushButton" name="muonButton">
             <property name="styleSheet">
-             <string notr="true">border-radius: 10px;
-border-width: 2px;
-border-color: belge;
-border-style: solid;</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Mượn</string>
@@ -531,7 +528,7 @@ color: black;</string>
          <enum>QAbstractItemView::ExtendedSelection</enum>
         </property>
         <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectItems</enum>
+         <enum>QAbstractItemView::SelectRows</enum>
         </property>
         <property name="sortingEnabled">
          <bool>true</bool>

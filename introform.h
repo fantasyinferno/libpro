@@ -27,7 +27,7 @@ private slots:
     void on_dangKyButton_clicked();
 
 signals:
-    void dangNhapThanhCong(QString);
+    void dangNhapThanhCong(int, QString);
 
 
 

@@ -59,14 +59,9 @@ Information::~Information()
 void Information::checkVt() {
     QSqlQuery query(0, db);
 
-    query.prepare("select account_id from account where account = :tdn;");
-    query.bindValue(":tdn", tdn);
-    query.exec();
-    query.next();
-    int id = query.value(0).toInt();
 
     query.prepare("SELECT * FROM account_role WHERE account_id = :id");
-    query.bindValue(":id", id);
+    query.bindValue(":id", user_id);
     query.exec();
 
     while (query.next()) {
@@ -92,7 +87,7 @@ void Information::submitVt()
 
 
     query.prepare("select account_id from account where account = :tdn;");
-    query.bindValue(":tdn", tdn);
+    query.bindValue(":tdn", user);
     query.exec();
     query.next();
     int id = query.value(0).toInt();
@@ -168,24 +163,26 @@ void Information::on_thayDoiButton_clicked()
 {
     enableEdit();
 }
-void Information::on_dangNhapThanhCong(QString username) {
-    tdn = username;
-    ui->username->setText(tdn);
+void Information::on_dangNhapThanhCong(int id, QString username) {
+    user = username;
+    ui->username->setText(user);
+    user_id = id;
+    // Model cho thông tin cá nhân
     model = new QSqlRelationalTableModel(0, db);
     model->setTable("account");
     int genderIdx = model->fieldIndex("gender_id");
     int statusIdx = model->fieldIndex("status_id");
     model->setRelation(genderIdx, QSqlRelation("gender", "gender_id", "gender"));
     model->setRelation(statusIdx, QSqlRelation("status", "status_id", "status"));
-    model->setFilter("account = '" + tdn + "'");
+    model->setFilter(QString("account_id = '%1'").arg(user_id)); // SQL Injection Alert!
     model->select();
-
     QSqlTableModel *relModelGender = model->relationModel(genderIdx);
     QSqlTableModel *relModelStatus = model->relationModel(statusIdx);
     ui->ip_gt->setModel(relModelGender);
     ui->ip_gt->setModelColumn(relModelGender->fieldIndex("gender"));
     ui->ip_tt->setModel(relModelStatus);
     ui->ip_tt->setModelColumn(relModelStatus->fieldIndex("status"));
+    // Mapper để liên hệ cái trường vào cơ sở dữ liệu
     mapper = new QDataWidgetMapper(this);
     mapper->setModel(model);
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
@@ -199,10 +196,38 @@ void Information::on_dangNhapThanhCong(QString username) {
     mapper->addMapping(ui->ip_em, model->fieldIndex("email"));
     mapper->addMapping(ui->ip_ns, model->fieldIndex("birthdate"));
     mapper->toFirst();
+    // Gọi hàm kiểm tra vai trò
     checkVt();
+
+    // Model cho sách đã mượn
+    bookModel = new QSqlRelationalTableModel(this);
+    bookModel->setTable("account_book");
+    qDebug() << user_id;
+    bookModel->setFilter(QString("account_id = %1").arg(user_id)); // SQL Injection Alert!
+    bookModel->setRelation(bookModel->fieldIndex("book_id"), QSqlRelation("book", "book_id", "title"));
+    bookModel->select();
+    ui->sachDaMuon->setModel(bookModel);
+    ui->sachDaMuon->setItemDelegate(new QSqlRelationalDelegate(this));
+    ui->sachDaMuon->setModelColumn(1);
 }
 
 void Information::on_huyButton_clicked()
 {
     enableEdit(false);
+}
+void Information::on_updateMyBooks(const QModelIndexList& selectedList) {
+    QSqlQuery query(0, db);
+    query.prepare("INSERT INTO account_book(account_id, book_id, start_date, due_date) VALUES(:account_id, :book_id, :start_date, :due_date)");
+    query.bindValue(":account_id", user_id);
+    QDate today = QDate::currentDate();
+    for (int i = 0; i != selectedList.size(); ++i) {
+        QString book_id = selectedList[i].data().toString();
+        qDebug() << book_id;
+        query.bindValue(":book_id", book_id);
+        query.bindValue(":start_date", today);
+        query.bindValue(":due_date", today.addDays(15));
+        if (!query.exec())
+            qDebug() << query.lastError();
+    }
+    bookModel->select();
 }
