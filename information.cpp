@@ -195,6 +195,10 @@ void Information::on_dangNhapThanhCong(int id, QString username) {
     mapper->addMapping(ui->ip_nn, model->fieldIndex("job"));
     mapper->addMapping(ui->ip_em, model->fieldIndex("email"));
     mapper->addMapping(ui->ip_ns, model->fieldIndex("birthdate"));
+    QByteArray imageByteArray = model->data(model->index(0, model->fieldIndex("avatar"))).toByteArray();
+    QPixmap pixmap;
+    pixmap.loadFromData(imageByteArray);
+    ui->avatar->setPixmap(pixmap);
     mapper->toFirst();
     // Gọi hàm kiểm tra vai trò
     checkVt();
@@ -225,7 +229,6 @@ void Information::on_updateMyBooks(const QModelIndexList& selectedList) {
     QDate today = QDate::currentDate();
     for (int i = 0; i != selectedList.size(); ++i) {
         QString book_id = selectedList[i].data().toString();
-        qDebug() << book_id;
         query.bindValue(":book_id", book_id);
         query.bindValue(":start_date", today);
         query.bindValue(":due_date", today.addDays(15));

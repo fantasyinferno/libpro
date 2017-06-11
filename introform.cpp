@@ -7,6 +7,9 @@
 #include <QString>
 #include <QMessageBox>
 #include <QDebug>
+#include <QFile>
+#include <QFileDialog>
+#include <QBuffer>
 #include "readergui.h"
 
 IntroForm::IntroForm(QWidget *parent) :
@@ -92,10 +95,12 @@ void IntroForm::on_dangKyButton_clicked()
         QMessageBox::critical(this,"Mật khẩu","Nhập lại mật khẩu không đúng");
         return;
     }
-
     QSqlQuery query(0,db);
-    query.prepare("insert into account(account, password, status_id, fullname, identity_number, gender_id, birthdate, email, job) values(:tdn, :mk, :tt, :hvt, :cmnd, :gt, :ns, :em, :cv);");
-
+    QByteArray imageByteArray;
+    QBuffer inBuffer(&imageByteArray);
+    ui->avatar->pixmap()->save(&inBuffer, "PNG");
+    inBuffer.open(QIODevice::WriteOnly);
+    query.prepare("insert into account(account, password, status_id, fullname, identity_number, gender_id, birthdate, email, job, avatar) values(:tdn, :mk, :tt, :hvt, :cmnd, :gt, :ns, :em, :cv, :av);");
     query.bindValue(":tdn",ui->dk_tdn->text());
     query.bindValue(":mk",ui->dk_mk->text());
     query.bindValue(":tt",1);
@@ -105,6 +110,7 @@ void IntroForm::on_dangKyButton_clicked()
     query.bindValue(":ns", ui->dk_ns->date());
     query.bindValue(":cv",(ui->dk_cv->text()!=""? ui->dk_cv->text() : NULL));
     query.bindValue(":em",(ui->dk_em->text()!=""? ui->dk_em->text() : NULL));
+    query.bindValue(":av", imageByteArray);
     bool ok = query.exec();
     int id = query.lastInsertId().toInt();
     query.prepare("INSERT INTO account_role VALUES (?, ?)");
@@ -130,5 +136,15 @@ void IntroForm::on_dangKyButton_clicked()
     }
     else{
         QMessageBox::about(this,"Lỗi","Không tạo được tài khoản");
+    }
+}
+
+void IntroForm::on_avatarButton_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Image Files (*.png *.jpg *.bmp)"));
+    if (!fileName.isEmpty()) {
+        QPixmap pixmap(fileName);
+        pixmap = pixmap.scaled(180, 180);
+        ui->avatar->setPixmap(pixmap);
     }
 }

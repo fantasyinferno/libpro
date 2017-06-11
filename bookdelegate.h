@@ -13,7 +13,8 @@ class BookDelegate : public QSqlRelationalDelegate
 public:
     BookDelegate(QObject *parent);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    void setEditorData(QWidget *editor, const QModelIndex &index);
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const;
 };
 
 #endif // BOOKDELEGATE_H

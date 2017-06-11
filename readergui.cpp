@@ -8,6 +8,7 @@
 #include <QDate>
 #include <QSqlRecord>
 #include <QSqlError>
+#include <QByteArray>
 
 ReaderGUI::ReaderGUI(QWidget *parent) :
     QMainWindow(parent),
@@ -26,20 +27,6 @@ QSqlDatabase ReaderGUI::getDatabase() {
 }
 QString ReaderGUI::getUser() {
     return user;
-}
-
-void ReaderGUI::on_selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
-{
-    if (!ui->danhMucSach->selectionModel()->selectedRows(1).empty()) {
-        QModelIndex bookPathIndex = ui->danhMucSach->selectionModel()->selectedRows(1).back();
-        QString imagePath = ui->danhMucSach->model()->data(bookPathIndex).toString();
-        QPixmap qp = QPixmap(":" + imagePath);
-        ui->biaSach->setPixmap(qp);
-        ui->biaSach->setScaledContents(true);
-        ui->biaSach->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-        ui->hienThiSach->show();
-        ui->danhMucSach->selectionModel()->selectedRows();
-    }
 }
 
 void ReaderGUI::on_thanhTimKiem_returnPressed()
@@ -91,9 +78,9 @@ void ReaderGUI::initializeTable()
     ui->danhMucSach->setColumnWidth(2, 400);
     ui->danhMucSach->setColumnWidth(3, 400);
     ui->danhMucSach->setColumnHidden(6, true);
-    QObject::connect(ui->danhMucSach->selectionModel(), SIGNAL(selectionChanged( const QItemSelection &, const QItemSelection &)), SLOT(on_selectionChanged(const QItemSelection &, const QItemSelection &)));
     QDataWidgetMapper *mapper = new QDataWidgetMapper(this);
     mapper->setModel(model);
+    mapper->setItemDelegate(new BookDelegate(this));
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
     mapper->addMapping(ui->maSach, model->fieldIndex("book_id"));
     mapper->addMapping(ui->biaSach, model->fieldIndex("cover"));
@@ -101,7 +88,9 @@ void ReaderGUI::initializeTable()
     mapper->addMapping(ui->tuaDe, model->fieldIndex("title"));
     mapper->addMapping(ui->tacGia, model->fieldIndex("author"));
     mapper->addMapping(ui->namSanXuat, model->fieldIndex("year"));
+    mapper->addMapping(ui->biaSach, model->fieldIndex("cover"));
     connect(ui->danhMucSach->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), mapper, SLOT(setCurrentModelIndex(QModelIndex)));
+    connect(ui->danhMucSach->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), ui->hienThiSach, SLOT(show()));
     ui->hienThiSach->hide();
 }
 void ReaderGUI::initializeQuotes() {

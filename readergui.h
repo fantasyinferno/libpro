@@ -39,7 +39,6 @@ private:
 signals:
     void updateMyBooks(const QModelIndexList&);
 private slots:
-    void on_selectionChanged(const QItemSelection &, const QItemSelection &);
     void on_thanhTimKiem_returnPressed();
     void on_muon();
     void on_dangXuatButton_clicked();
