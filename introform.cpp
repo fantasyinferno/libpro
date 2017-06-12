@@ -98,8 +98,8 @@ void IntroForm::on_dangKyButton_clicked()
     QSqlQuery query(0,db);
     QByteArray imageByteArray;
     QBuffer inBuffer(&imageByteArray);
-    ui->avatar->pixmap()->save(&inBuffer, "PNG");
     inBuffer.open(QIODevice::WriteOnly);
+    ui->avatar->pixmap()->save(&inBuffer, "PNG");
     query.prepare("insert into account(account, password, status_id, fullname, identity_number, gender_id, birthdate, email, job, avatar) values(:tdn, :mk, :tt, :hvt, :cmnd, :gt, :ns, :em, :cv, :av);");
     query.bindValue(":tdn",ui->dk_tdn->text());
     query.bindValue(":mk",ui->dk_mk->text());

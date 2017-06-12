@@ -10,6 +10,8 @@
 #include <QSqlError>
 #include <QDebug>
 #include <QAction>
+#include <QFileDialog>
+#include <QBuffer>
 #include <QSqlRelation>
 #include "readergui.h"
 
@@ -131,6 +133,19 @@ void Information::submitVt()
         qDebug() << query.lastError();
     }
 }
+void Information::submitAv() {
+    QByteArray imageByteArray;
+    QBuffer inBuffer(&imageByteArray);
+    inBuffer.open(QIODevice::WriteOnly);
+    ui->avatar->icon().pixmap(180, 180).save(&inBuffer, "PNG");
+    QSqlQuery query(0, db);
+    query.prepare("UPDATE account SET avatar = ? WHERE account_id = ?");
+    query.addBindValue(imageByteArray);
+    query.addBindValue(user_id);
+    if (!query.exec()) {
+        qDebug() << query.lastError();
+    }
+}
 
 //*********************************
 
@@ -140,6 +155,7 @@ void Information::on_hoanTatButton_clicked()
     enableEdit(false);
     mapper->submit();
     submitVt();
+    submitAv();
 }
 
 void Information::enableEdit(bool enabled = true) {
@@ -156,6 +172,7 @@ void Information::enableEdit(bool enabled = true) {
     ui->ip_vt_reader->setEnabled(enabled);
     ui->hoanTatButton->setEnabled(enabled);
     ui->huyButton->setEnabled(enabled);
+    ui->avatar->setEnabled(enabled);
     ui->thayDoiButton->setEnabled(!enabled);
 }
 
@@ -198,7 +215,8 @@ void Information::on_dangNhapThanhCong(int id, QString username) {
     QByteArray imageByteArray = model->data(model->index(0, model->fieldIndex("avatar"))).toByteArray();
     QPixmap pixmap;
     pixmap.loadFromData(imageByteArray);
-    ui->avatar->setPixmap(pixmap);
+    ui->avatar->setIcon(QIcon(pixmap));
+    ui->avatar->setIconSize(QSize(180, 180));
     mapper->toFirst();
     // Gọi hàm kiểm tra vai trò
     checkVt();
@@ -217,7 +235,6 @@ void Information::on_dangNhapThanhCong(int id, QString username) {
     ui->sachDaMuon->setItemDelegate(new QSqlRelationalDelegate(this));
     ui->sachDaMuon->setColumnHidden(0, true);
 }
-
 void Information::on_huyButton_clicked()
 {
     enableEdit(false);
@@ -236,4 +253,14 @@ void Information::on_updateMyBooks(const QModelIndexList& selectedList) {
             qDebug() << query.lastError();
     }
     bookModel->select();
+}
+
+void Information::on_avatar_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Image Files (*.png *.jpg *.bmp)"));
+    if (!fileName.isEmpty()) {
+        QPixmap pixmap(fileName);
+        pixmap = pixmap.scaled(180, 180);
+        ui->avatar->setIcon(pixmap);
+    }
 }

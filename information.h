@@ -24,7 +24,7 @@ public:
     void submitVt();
     void checkVt();
     void enableEdit(bool);
-
+    void submitAv();
 
 private slots:
     void on_hoanTatButton_clicked();
@@ -32,6 +32,8 @@ private slots:
     void on_dangNhapThanhCong(int, QString);
     void on_updateMyBooks(const QModelIndexList& selectedList);
     void on_huyButton_clicked();
+
+    void on_avatar_clicked();
 
 signals:
 private:
