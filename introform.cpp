@@ -19,6 +19,10 @@ IntroForm::IntroForm(QWidget *parent) :
     }
     ui->dn_tdn->setFocus();
     ui->dk_tdn->setFocus();
+
+    ui->dk_vt_reader->setChecked(true);
+    ui->dk_vt_manager->setChecked(false);
+    ui->dk_vt_librarian->setChecked(false);
 }
 
 IntroForm::~IntroForm()
@@ -58,10 +62,6 @@ void IntroForm::setTab(int i)
 
 void IntroForm::on_dangKyButton_clicked()
 {
-
-
-
-
 //    query("select max(user_id) as user_id from user;");
 
     if (ui->dk_tdn->text()=="")
@@ -116,12 +116,12 @@ void IntroForm::on_dangKyButton_clicked()
     if (ui->dk_vt_librarian->isChecked()) {
         query.addBindValue(id);
         query.addBindValue(2);
-        ok &= query.exec();
+//        ok &= query.exec();
     }
     if (ui->dk_vt_manager->isChecked()) {
         query.addBindValue(id);
         query.addBindValue(3);
-        ok &= query.exec();
+//        ok &= query.exec();
     }
     if(ok){
         QMessageBox::about(this,"Đăng ký thành công","Đăng ký tài khoản thành công");
@@ -132,3 +132,17 @@ void IntroForm::on_dangKyButton_clicked()
         QMessageBox::about(this,"Lỗi","Không tạo được tài khoản");
     }
 }
+
+
+//
+
+void IntroForm::setType(bool isManager)
+{
+
+    ui->dk_vt_manager->setEnabled(isManager);
+    ui->dk_vt_librarian->setEnabled(isManager);
+    ui->dk_vt_reader->setEnabled(isManager);
+
+}
+
+

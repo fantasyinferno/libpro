@@ -19,35 +19,13 @@ Information::Information(QWidget *parent) :
 {
     ui->setupUi(this);
     db = dynamic_cast<ReaderGUI*>(parent)->getDatabase();
+
+    ui->ip_vt_librarian->setEnabled(false);
+    ui->ip_vt_manager->setEnabled(false);
+    ui->ip_vt_reader->setEnabled(false);
+    ui->ip_tt->setEnabled(false);
+
     enableEdit(false);
-}
-
-void Information::load(QString tendangnhap, QString vaitro)
-{
-
-    QSqlQuery query(0, db);
-
-    query.prepare("select * from account where account=:tdn");
-    query.bindValue(":tdn",tendangnhap);
-    query.exec();
-
-    QSqlRecord rec=query.record();
-    query.next();
-
-    query.prepare("select role from role where account =:tdn;");
-    query.bindValue(":tdn",tendangnhap);
-    query.exec();
-    query.next();
-    if (query.next())
-    {
-    }
-    if (query.next())
-    {
-    }
-
-    if (!(vaitro=="Manager"))
-    {
-    }
 
 }
 
@@ -83,8 +61,6 @@ void Information::checkVt() {
 void Information::submitVt()
 {
     QSqlQuery query(0,db);
-
-
 
     query.prepare("select account_id from account where account = :tdn;");
     query.bindValue(":tdn", user);
@@ -150,10 +126,10 @@ void Information::enableEdit(bool enabled = true) {
     ui->ip_mk->setEnabled(enabled);
     ui->ip_nn->setEnabled(enabled);
     ui->ip_ns->setEnabled(enabled);
-    ui->ip_tt->setEnabled(enabled);
-    ui->ip_vt_librarian->setEnabled(enabled);
-    ui->ip_vt_manager->setEnabled(enabled);
-    ui->ip_vt_reader->setEnabled(enabled);
+//    ui->ip_tt->setEnabled(enabled);
+//    ui->ip_vt_librarian->setEnabled(enabled);
+//    ui->ip_vt_manager->setEnabled(enabled);
+//    ui->ip_vt_reader->setEnabled(enabled);
     ui->hoanTatButton->setEnabled(enabled);
     ui->huyButton->setEnabled(enabled);
     ui->thayDoiButton->setEnabled(!enabled);

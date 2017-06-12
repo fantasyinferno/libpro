@@ -57,7 +57,7 @@ void ReaderGUI::on_muon() {
 }
 void ReaderGUI::initializeDatabase() {
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("F:/SoftwareDevelopment/Qt/libpro/libpro.db");
+    db.setDatabaseName("C:/Users/pc/Documents/QT/Ass2/Git/libpro/libpro.db");
     if (!db.open()) {
         return;
     }
@@ -110,7 +110,7 @@ void ReaderGUI::initializeQuotes() {
     quoteQuery.next();
     QString quote = quoteQuery.value(0).toString();
     QString author = quoteQuery.value(1).toString();
-    ui->quotesLabel->setText("'" + quote + "'\n - " + author);
+    ui->quotesLabel->setText("'" + quote + "'/n - " + author);
     this->show();
 }
 void ReaderGUI::initializeGUILogic() {
@@ -147,6 +147,7 @@ void ReaderGUI::on_dangNhapButton_clicked()
 void ReaderGUI::on_dangKyButton_clicked()
 {
     introForm->setTab(1);
+    introForm->setType(false);
     introForm->show();
 }
 
@@ -158,6 +159,7 @@ void ReaderGUI::on_dangNhapThanhCong(int id, QString username) {
     ui->dangXuatButton->show();
     ui->username->setText(user);
     ui->username->setEnabled(true);
+    qDebug()<<"abc";
 }
 
 void ReaderGUI::on_username_clicked()

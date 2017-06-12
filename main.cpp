@@ -11,12 +11,12 @@ int main(int argc, char *argv[])
     ReaderGUI readerGUI;
     LibrarianGUI librarianGUI;
     ManagerGUI managerGUI;
-    //managerGUI.show();
+    managerGUI.show();
     readerGUI.show();
     QIcon icon(":/media/images/logo.png");
     a.setWindowIcon(icon);
     readerGUI.setWindowTitle("LIBPRO");
-//  QObject::connect(&introForm, SIGNAL(dangNhapClicked(const QString)), &readerGUI, SLOT(on_display(const QString)));
+//    QObject::connect(&introForm, SIGNAL(dangNhapClicked(const QString)), &readerGUI, SLOT(on_display(const QString)));
     return a.exec();
 }
 
