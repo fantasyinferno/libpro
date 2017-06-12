@@ -6,7 +6,7 @@
 #include <QSqlQueryModel>
 #include <QItemSelection>
 
-
+//asd
 namespace Ui {
 class IntroForm;
 }
