@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="tabBarAutoHide">
       <bool>true</bool>
@@ -376,6 +376,12 @@
              <property name="text">
               <string/>
              </property>
+             <property name="pixmap">
+              <pixmap resource="resources.qrc">:/media/images/default.png</pixmap>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
             </widget>
            </item>
            <item>
@@ -457,6 +463,8 @@
   <tabstop>dk_cmnd</tabstop>
   <tabstop>dk_cv</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
