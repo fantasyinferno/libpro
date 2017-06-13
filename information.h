@@ -8,7 +8,6 @@
 #include <QDataWidgetMapper>
 #include <QSqlRelationalTableModel>
 
-
 namespace Ui {
 class Information;
 }
@@ -32,10 +31,11 @@ private slots:
     void on_dangNhapThanhCong(int, QString);
     void on_updateMyBooks(const QModelIndexList& selectedList);
     void on_huyButton_clicked();
-
     void on_avatarButton_clicked();
-
+    void on_currentIndexChanged(int);
+    void on_dangXuat();
 signals:
+    void avatarChanged(const QPixmap* pixmap);
 private:
     QSqlDatabase db;
     Ui::Information *ui;

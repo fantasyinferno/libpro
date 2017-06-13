@@ -5,6 +5,7 @@
 #include <QSqlTableModel>
 #include <QSqlQueryModel>
 #include <QItemSelection>
+#include <QLabel>
 #include "information.h"
 #include "introform.h"
 namespace Ui {
@@ -38,6 +39,7 @@ private:
     int user_id;
 signals:
     void updateMyBooks(const QModelIndexList&);
+    void dangXuat();
 private slots:
     void on_thanhTimKiem_returnPressed();
     void on_muon();
@@ -47,6 +49,7 @@ private slots:
     void on_dangNhapThanhCong(int, QString);
     void on_username_clicked();
     void on_muonButton_clicked();
+    void on_avatarChanged(const QPixmap*);
 };
 
 #endif // READERGUI_H

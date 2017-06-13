@@ -10,7 +10,8 @@ AccountDelegate::AccountDelegate(QWidget* parent): QSqlRelationalDelegate(parent
 }
 void AccountDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
     if (index.column() != 10) {
-        return QSqlRelationalDelegate::setEditorData(editor, index);
+        QSqlRelationalDelegate::setEditorData(editor, index);
+        return;
     }
     QLabel *label = qobject_cast<QLabel*>(editor);
     if (label) {
@@ -23,7 +24,8 @@ void AccountDelegate::setEditorData(QWidget *editor, const QModelIndex &index) c
 }
 void AccountDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const {
     if (index.column() != 10) {
-        return QSqlRelationalDelegate::setModelData(editor, model, index);
+        QSqlRelationalDelegate::setModelData(editor, model, index);
+        return;
     }
     QLabel *label = qobject_cast<QLabel*>(editor);
     if (label) {
@@ -32,6 +34,5 @@ void AccountDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, c
         if (label->pixmap()->save(&inBuffer, "PNG")) {
             model->setData(index, inBuffer.data(), Qt::EditRole);
         }
-
     }
 }

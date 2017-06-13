@@ -112,8 +112,10 @@ void ReaderGUI::initializeGUILogic() {
     information->setWindowTitle("Thông tin cá nhân");
     connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), this, SLOT(on_dangNhapThanhCong(int, QString)));
     connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), information, SLOT(on_dangNhapThanhCong(int, QString)));
+    connect(information, SIGNAL(avatarChanged(const QPixmap*)), this, SLOT(on_avatarChanged(const QPixmap*)));
     connect(this, SIGNAL(updateMyBooks(const QModelIndexList&)), information, SLOT(on_updateMyBooks(const QModelIndexList&)));
     connect(ui->timKiemButton, SIGNAL(clicked()), this, SLOT(on_thanhTimKiem_returnPressed()));
+    connect(this, SIGNAL(dangXuat()), information, SLOT(on_dangXuat()));
     ui->dangXuatButton->hide();
     ui->username->setEnabled(false);
 }
@@ -122,9 +124,12 @@ void ReaderGUI::on_dangXuatButton_clicked()
 {
     user = "";
     ui->username->setText("");
+    ui->username->setEnabled(false);
     ui->dangXuatButton->hide();
     ui->dangKyButton->show();
     ui->dangNhapButton->show();
+    ui->avatarIcon->clear();
+    emit dangXuat();
 }
 
 void ReaderGUI::on_dangNhapButton_clicked()
@@ -158,4 +163,8 @@ void ReaderGUI::on_muonButton_clicked()
 {
     // Note: updateMyBooks should be connected to information's slot
     emit updateMyBooks(ui->danhMucSach->selectionModel()->selectedRows());
+}
+
+void ReaderGUI::on_avatarChanged(const QPixmap* pixmap) {
+    ui->avatarIcon->setPixmap(*pixmap);
 }
