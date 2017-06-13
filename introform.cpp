@@ -20,8 +20,6 @@ IntroForm::IntroForm(QWidget *parent) :
     if (parent) {
         db = dynamic_cast<ReaderGUI*>(parent)->getDatabase();
     }
-    ui->dn_tdn->setFocus();
-    ui->dk_tdn->setFocus();
 }
 
 IntroForm::~IntroForm()
@@ -57,6 +55,9 @@ void IntroForm::on_pushButton_clicked()
 void IntroForm::setTab(int i)
 {
     ui->tabWidget->setCurrentIndex(i);
+    if (i == 0)
+        ui->dn_tdn->setFocus();
+    else ui->dk_tdn->setFocus();
 }
 
 void IntroForm::on_dangKyButton_clicked()

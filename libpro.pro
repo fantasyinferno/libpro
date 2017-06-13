@@ -29,14 +29,16 @@ SOURCES += main.cpp\
     librariangui.cpp \
     information.cpp \
     introform.cpp \
-    managergui.cpp
+    managergui.cpp \
+    accountdelegate.cpp
 
 HEADERS  += introform.h \
     readergui.h \
     bookdelegate.h \
     librariangui.h \
     information.h \
-    managergui.h
+    managergui.h \
+    accountdelegate.h
 
 FORMS    += \
     readergui.ui \

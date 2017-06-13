@@ -13,6 +13,7 @@
 #include <QFileDialog>
 #include <QBuffer>
 #include <QSqlRelation>
+#include "accountdelegate.h"
 #include "readergui.h"
 
 Information::Information(QWidget *parent) :
@@ -137,7 +138,7 @@ void Information::submitAv() {
     QByteArray imageByteArray;
     QBuffer inBuffer(&imageByteArray);
     inBuffer.open(QIODevice::WriteOnly);
-    ui->avatar->icon().pixmap(180, 180).save(&inBuffer, "PNG");
+    ui->avatar->pixmap()->save(&inBuffer, "PNG");
     QSqlQuery query(0, db);
     query.prepare("UPDATE account SET avatar = ? WHERE account_id = ?");
     query.addBindValue(imageByteArray);
@@ -155,7 +156,7 @@ void Information::on_hoanTatButton_clicked()
     enableEdit(false);
     mapper->submit();
     submitVt();
-    submitAv();
+//    submitAv();
 }
 
 void Information::enableEdit(bool enabled = true) {
@@ -172,8 +173,8 @@ void Information::enableEdit(bool enabled = true) {
     ui->ip_vt_reader->setEnabled(enabled);
     ui->hoanTatButton->setEnabled(enabled);
     ui->huyButton->setEnabled(enabled);
-    ui->avatar->setEnabled(enabled);
     ui->thayDoiButton->setEnabled(!enabled);
+    ui->avatarButton->setEnabled(enabled);
 }
 
 void Information::on_thayDoiButton_clicked()
@@ -203,7 +204,8 @@ void Information::on_dangNhapThanhCong(int id, QString username) {
     mapper = new QDataWidgetMapper(this);
     mapper->setModel(model);
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
-    mapper->setItemDelegate(new QSqlRelationalDelegate(this));
+    mapper->setItemDelegate(new AccountDelegate(this));
+    mapper->addMapping(ui->avatar, model->fieldIndex("avatar"));
     mapper->addMapping(ui->ip_mk, model->fieldIndex("password"));
     mapper->addMapping(ui->ip_tt, statusIdx);
     mapper->addMapping(ui->ip_hvt, model->fieldIndex("fullname"));
@@ -212,11 +214,10 @@ void Information::on_dangNhapThanhCong(int id, QString username) {
     mapper->addMapping(ui->ip_nn, model->fieldIndex("job"));
     mapper->addMapping(ui->ip_em, model->fieldIndex("email"));
     mapper->addMapping(ui->ip_ns, model->fieldIndex("birthdate"));
-    QByteArray imageByteArray = model->data(model->index(0, model->fieldIndex("avatar"))).toByteArray();
-    QPixmap pixmap;
-    pixmap.loadFromData(imageByteArray);
-    ui->avatar->setIcon(QIcon(pixmap));
-    ui->avatar->setIconSize(QSize(180, 180));
+//    QByteArray imageByteArray = model->data(model->index(0, model->fieldIndex("avatar"))).toByteArray();
+//    QPixmap pixmap;
+//    pixmap.loadFromData(imageByteArray);
+//    ui->avatar->setPixmap(pixmap);
     mapper->toFirst();
     // Gọi hàm kiểm tra vai trò
     checkVt();
@@ -238,6 +239,11 @@ void Information::on_dangNhapThanhCong(int id, QString username) {
 void Information::on_huyButton_clicked()
 {
     enableEdit(false);
+    mapper->toFirst();
+//    QByteArray imageByteArray = model->data(model->index(0, model->fieldIndex("avatar"))).toByteArray();
+//    QPixmap pixmap;
+//    pixmap.loadFromData(imageByteArray);
+//    ui->avatar->setPixmap(pixmap);
 }
 void Information::on_updateMyBooks(const QModelIndexList& selectedList) {
     QSqlQuery query(0, db);
@@ -255,12 +261,12 @@ void Information::on_updateMyBooks(const QModelIndexList& selectedList) {
     bookModel->select();
 }
 
-void Information::on_avatar_clicked()
+void Information::on_avatarButton_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Image Files (*.png *.jpg *.bmp)"));
     if (!fileName.isEmpty()) {
         QPixmap pixmap(fileName);
         pixmap = pixmap.scaled(180, 180);
-        ui->avatar->setIcon(pixmap);
+        ui->avatar->setPixmap(pixmap);
     }
 }
