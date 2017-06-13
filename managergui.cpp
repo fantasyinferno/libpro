@@ -5,6 +5,7 @@ ManagerGUI::ManagerGUI(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ManagerGUI)
 {
+    // Do something here
     ui->setupUi(this);
 }
 

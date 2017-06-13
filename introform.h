@@ -23,8 +23,9 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-
     void on_dangKyButton_clicked();
+
+    void on_avatarButton_clicked();
 
 signals:
     void dangNhapThanhCong(int, QString);
