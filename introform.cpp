@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
+#include <QSqlError>
 #include <QBuffer>
 #include "readergui.h"
 
@@ -137,6 +138,7 @@ void IntroForm::on_dangKyButton_clicked()
     }
     else{
         QMessageBox::about(this,"Lỗi","Không tạo được tài khoản");
+        qDebug() << query.lastError();
     }
 }
 
