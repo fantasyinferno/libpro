@@ -172,3 +172,8 @@ void ReaderGUI::on_muonButton_clicked()
     // Note: updateMyBooks should be connected to information's slot
     emit updateMyBooks(ui->danhMucSach->selectionModel()->selectedRows());
 }
+
+void ReaderGUI::on_timKiemButton_clicked()
+{
+
+}

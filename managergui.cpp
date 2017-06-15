@@ -106,6 +106,11 @@ void ManagerGUI::initializeTable()
     ui->id->setEnabled(false);
     ui->tenDangNhap->setEnabled(false);
 
+    QStringList gioitinh=(QStringList()<<"Tất cả"<<"Nam"<<"Nữ");
+    QStringList tinhtrang=(QStringList()<<"Tất cả"<<"Hoạt động"<<"Bị khóa");
+    ui->combo_gioitinh->addItems(gioitinh);
+    ui->combo_tinhtrang->addItems(tinhtrang);
+
 }
 
 void ManagerGUI::on_dangKyButton_clicked()
@@ -202,7 +207,12 @@ void ManagerGUI::on_thayDoiButton_clicked()
 {
     mapper->submit();
     submitVt();
+//    QSqlQuery query(0,db);
+//    query.prepare("update account set status_id=:tt where id=:id");
+//    query.bindValue(":id",ui->);
 }
+
+
 
 void ManagerGUI::on_xoaButton_clicked()
 {
@@ -224,4 +234,57 @@ void ManagerGUI::on_xoaButton_clicked()
 void ManagerGUI::on_thanhTimKiem_returnPressed()
 {
 
+
+//    QString type = ui->luaChon->text();
+    QString keyword = ui->thanhTimKiem->text();
+
+    QString s="";
+
+    if (ui->f_id->isChecked())
+    {
+        qDebug()<<"id='"+keyword+"'";
+        model->setFilter("account_id="+keyword);
+        return;
+    }
+
+    if (ui->f_tendangnhap->isChecked())
+    {
+        s=s+((s=="")? "" : " OR ")+"account LIKE '%%1%'";
+    }
+
+    if (ui->f_hovaten->isChecked())
+    {
+        s=s+((s=="")? "" : " OR ")+"fullname LIKE '%%1%'";
+    }
+
+    if (ui->f_cmnd->isChecked())
+    {
+        s=s+((s=="")? "" : " OR ")+"identity_number LIKE '%%1%'";
+    }
+
+    if (ui->combo_gioitinh->currentText()!="Tất cả")
+    {
+        s=s+((s=="")? "" : " AND ")+"gender='"+ui->combo_gioitinh->currentText()+"'";
+    }
+
+    if (ui->combo_tinhtrang->currentText()!="Tất cả")
+    {
+        s=s+((s=="")? "" : " AND ")+"status='"+ui->combo_tinhtrang->currentText()+"'";
+    }
+    if (s=="")
+    {
+        model->setFilter("");
+        return;
+    }
+
+    if (keyword!="")
+        s=s.arg(keyword);
+    qDebug()<<s;
+    model->setFilter(s);
+
+}
+
+void ManagerGUI::on_timKiemButton_clicked()
+{
+    on_thanhTimKiem_returnPressed();
 }

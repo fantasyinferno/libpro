@@ -48,6 +48,7 @@ private slots:
     void on_dangNhapThanhCong(int, QString);
     void on_username_clicked();
     void on_muonButton_clicked();
+    void on_timKiemButton_clicked();
 };
 
 #endif // READERGUI_H

@@ -36,6 +36,8 @@ private slots:
 
     void on_thanhTimKiem_returnPressed();
 
+    void on_timKiemButton_clicked();
+
 private:
     QSqlRelationalTableModel *model;
     Information *information;
