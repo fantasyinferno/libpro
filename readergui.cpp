@@ -10,12 +10,12 @@
 #include <QSqlError>
 #include <QByteArray>
 
-ReaderGUI::ReaderGUI(QWidget *parent) :
+ReaderGUI::ReaderGUI(QWidget *parent, QSqlDatabase database) :
     QMainWindow(parent),
     ui(new Ui::ReaderGUI)
 {
     ui->setupUi(this);
-    initializeGUILogic();
+    initializeGUILogic(database);
 }
 
 ReaderGUI::~ReaderGUI()
@@ -42,12 +42,8 @@ void ReaderGUI::on_thanhTimKiem_returnPressed()
 void ReaderGUI::on_muon() {
 
 }
-void ReaderGUI::initializeDatabase() {
-    db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("F:/SoftwareDevelopment/Qt/libpro/libpro.db");
-    if (!db.open()) {
-        return;
-    }
+void ReaderGUI::initializeDatabase(QSqlDatabase database = QSqlDatabase()) {
+    db = database;
 }
 
 void ReaderGUI::initializeTable()
@@ -102,21 +98,13 @@ void ReaderGUI::initializeQuotes() {
     ui->quotesLabel->setText("'" + quote + "'\n - " + author);
     this->show();
 }
-void ReaderGUI::initializeGUILogic() {
-    initializeDatabase();
+void ReaderGUI::initializeGUILogic(QSqlDatabase database) {
+    initializeDatabase(database);
     initializeTable();
     initializeQuotes();
-    introForm = new IntroForm(this);
-    introForm->setWindowTitle("Đăng nhập/Đăng ký");
-    information = new Information(this);
-    information->setWindowTitle("Thông tin cá nhân");
-    connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), this, SLOT(on_dangNhapThanhCong(int, QString)));
-    connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), information, SLOT(on_dangNhapThanhCong(int, QString)));
-    connect(information, SIGNAL(avatarChanged(const QPixmap*)), this, SLOT(on_avatarChanged(const QPixmap*)));
-    connect(this, SIGNAL(updateMyBooks(const QModelIndexList&)), information, SLOT(on_updateMyBooks(const QModelIndexList&)));
     connect(ui->timKiemButton, SIGNAL(clicked()), this, SLOT(on_thanhTimKiem_returnPressed()));
-    connect(this, SIGNAL(dangXuat()), information, SLOT(on_dangXuat()));
     ui->dangXuatButton->hide();
+    ui->chuyenVaiTroButton->hide();
     ui->username->setEnabled(false);
 }
 
@@ -129,19 +117,21 @@ void ReaderGUI::on_dangXuatButton_clicked()
     ui->dangKyButton->show();
     ui->dangNhapButton->show();
     ui->avatarIcon->clear();
+    ui->chuyenVaiTroButton->hide();
     emit dangXuat();
 }
 
 void ReaderGUI::on_dangNhapButton_clicked()
 {
-    introForm->setTab(0);
-    introForm->show();
+    emit formRequest(0);
 }
 
 void ReaderGUI::on_dangKyButton_clicked()
 {
-    introForm->setTab(1);
-    introForm->show();
+    emit formRequest(1);
+}
+void ReaderGUI::on_username_clicked() {
+    emit informationRequest();
 }
 
 void ReaderGUI::on_dangNhapThanhCong(int id, QString username) {
@@ -152,11 +142,7 @@ void ReaderGUI::on_dangNhapThanhCong(int id, QString username) {
     ui->dangXuatButton->show();
     ui->username->setText(user);
     ui->username->setEnabled(true);
-}
-
-void ReaderGUI::on_username_clicked()
-{
-    information->show();
+    ui->chuyenVaiTroButton->show();
 }
 
 void ReaderGUI::on_muonButton_clicked()
@@ -167,4 +153,9 @@ void ReaderGUI::on_muonButton_clicked()
 
 void ReaderGUI::on_avatarChanged(const QPixmap* pixmap) {
     ui->avatarIcon->setPixmap(*pixmap);
+}
+
+void ReaderGUI::on_chuyenVaiTroButton_clicked()
+{
+    emit chuyenVaiTro();
 }

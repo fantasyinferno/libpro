@@ -111,6 +111,13 @@ color: white;</string>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
+             <widget class="QPushButton" name="chuyenVaiTroButton">
+              <property name="text">
+               <string>Chuyển vai trò</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="dangXuatButton">
               <property name="autoFillBackground">
                <bool>false</bool>

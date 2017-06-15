@@ -16,16 +16,15 @@
 #include "accountdelegate.h"
 #include "readergui.h"
 
-Information::Information(QWidget *parent) :
+Information::Information(QWidget *parent, QSqlDatabase database) :
     QDialog(parent),
     ui(new Ui::Information)
 {
     ui->setupUi(this);
-    db = dynamic_cast<ReaderGUI*>(parent)->getDatabase();
+    this->setModal(true);
+    db = database;
 
     enableEdit(false);
-
-
     // Model cho thông tin cá nhân
     model = new QSqlRelationalTableModel(0, db);
     model->setTable("account");
@@ -61,6 +60,9 @@ Information::Information(QWidget *parent) :
     // Model cho sách đã mượn
     bookModel = new QSqlRelationalTableModel(this);
     bookModel->setTable("account_book");
+}
+void Information::on_informationRequest() {
+    this->show();
 }
 
 void Information::load(QString tendangnhap, QString vaitro)

@@ -17,7 +17,7 @@ class Information : public QDialog
     Q_OBJECT
 
 public:
-    explicit Information(QWidget *parent = 0);
+    explicit Information(QWidget *parent = 0, QSqlDatabase database = QSqlDatabase());
     ~Information();
     void load(QString, QString);
     void submitVt();
@@ -33,6 +33,7 @@ private slots:
     void on_huyButton_clicked();
     void on_avatarButton_clicked();
     void on_currentIndexChanged(int);
+    void on_informationRequest();
     void on_dangXuat();
 signals:
     void avatarChanged(const QPixmap* pixmap);

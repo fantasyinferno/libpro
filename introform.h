@@ -16,7 +16,7 @@ class IntroForm : public QDialog
     Q_OBJECT
 
 public:
-    explicit IntroForm(QWidget *parent = 0);
+    explicit IntroForm(QWidget *parent = 0, QSqlDatabase = QSqlDatabase());
     ~IntroForm();
 
     void setTab(int);
@@ -24,9 +24,8 @@ public:
 private slots:
     void on_pushButton_clicked();
     void on_dangKyButton_clicked();
-
     void on_avatarButton_clicked();
-
+    void on_formRequest(int tab);
 signals:
     void dangNhapThanhCong(int, QString);
 

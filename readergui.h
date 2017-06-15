@@ -17,9 +17,9 @@ class ReaderGUI : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit ReaderGUI(QWidget *parent = 0);
-    void initializeGUILogic();
-    void initializeDatabase();
+    explicit ReaderGUI(QWidget *parent = 0, QSqlDatabase database = QSqlDatabase());
+    void initializeGUILogic(QSqlDatabase);
+    void initializeDatabase(QSqlDatabase);
     void initializeTable();
     void initializeQuotes();
     QSqlDatabase getDatabase();
@@ -30,8 +30,6 @@ private:
     Ui::ReaderGUI *ui;
     // Model thể hiện thông tin lấy từ cơ sở dữ liệu
     QSqlTableModel *model;
-    IntroForm *introForm;
-    Information *information;
     // Cơ sở dữ liệu.
     QSqlDatabase db;
     // Tên truy cập và id
@@ -39,7 +37,10 @@ private:
     int user_id;
 signals:
     void updateMyBooks(const QModelIndexList&);
+    void chuyenVaiTro();
+    void formRequest(int);
     void dangXuat();
+    void informationRequest();
 private slots:
     void on_thanhTimKiem_returnPressed();
     void on_muon();
@@ -50,6 +51,7 @@ private slots:
     void on_username_clicked();
     void on_muonButton_clicked();
     void on_avatarChanged(const QPixmap*);
+    void on_chuyenVaiTroButton_clicked();
 };
 
 #endif // READERGUI_H

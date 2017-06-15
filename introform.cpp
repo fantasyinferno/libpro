@@ -13,14 +13,13 @@
 #include <QBuffer>
 #include "readergui.h"
 
-IntroForm::IntroForm(QWidget *parent) :
+IntroForm::IntroForm(QWidget *parent, QSqlDatabase database) :
     QDialog(parent),
     ui(new Ui::IntroForm)
 {
     ui->setupUi(this);
-    if (parent) {
-        db = dynamic_cast<ReaderGUI*>(parent)->getDatabase();
-    }
+    this->setModal(true);
+    db = database;
 }
 
 IntroForm::~IntroForm()
@@ -150,4 +149,9 @@ void IntroForm::on_avatarButton_clicked()
         pixmap = pixmap.scaled(180, 180);
         ui->avatar->setPixmap(pixmap);
     }
+}
+
+void IntroForm::on_formRequest(int tab) {
+    this->setTab(tab);
+    this->show();
 }
