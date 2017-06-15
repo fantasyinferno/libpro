@@ -41,6 +41,7 @@ signals:
     void formRequest(int);
     void dangXuat();
     void informationRequest();
+    void aboutTriggered();
 private slots:
     void on_thanhTimKiem_returnPressed();
     void on_muon();
@@ -52,6 +53,7 @@ private slots:
     void on_muonButton_clicked();
     void on_avatarChanged(const QPixmap*);
     void on_chuyenVaiTroButton_clicked();
+    void on_actionAbout_LIBPRO_triggered();
 };
 
 #endif // READERGUI_H

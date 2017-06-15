@@ -5,8 +5,9 @@
 #include "introform.h"
 #include "accountchooser.h"
 #include "readergui.h"
-#include "librariangui.h"
 #include "managergui.h"
+#include "librariangui.h"
+#include "about.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -16,9 +17,11 @@ int main(int argc, char *argv[])
         return -1;
     }
     ReaderGUI readerGUI(0, db);
+    LibrarianGUI librarianGUI(0, db);
     IntroForm introForm(&readerGUI, db);
     Information information(&readerGUI, db);
     AccountChooser accountChooser(&readerGUI, db);
+    About about(&readerGUI);
     introForm.setWindowTitle("Đăng nhập/Đăng ký");
     information.setWindowTitle("Thông tin cá nhân");
     accountChooser.setWindowTitle("Thay đổi tài khoản");
@@ -31,11 +34,15 @@ int main(int argc, char *argv[])
     QObject::connect(&readerGUI, SIGNAL(chuyenVaiTro()), &accountChooser, SLOT(show()));
     QObject::connect(&readerGUI, SIGNAL(formRequest(int)), &introForm, SLOT(on_formRequest(int)));
     QObject::connect(&readerGUI, SIGNAL(informationRequest()), &information, SLOT(on_informationRequest()));
+    QObject::connect(&readerGUI, SIGNAL(aboutTriggered()), &about, SLOT(show()));
+    QObject::connect(&librarianGUI, SIGNAL(aboutTriggered()), &about, SLOT(show()));
     //managerGUI.show();
+    librarianGUI.hide();
     readerGUI.show();
     QIcon icon(":/media/images/logo.png");
     a.setWindowIcon(icon);
     readerGUI.setWindowTitle("LIBPRO");
+    librarianGUI.setWindowTitle("LIBPRO");
 //  QObject::connect(&introForm, SIGNAL(dangNhapClicked(const QString)), &readerGUI, SLOT(on_display(const QString)));
     return a.exec();
 }

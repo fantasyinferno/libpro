@@ -9,6 +9,7 @@
 #include <QSqlRecord>
 #include <QSqlError>
 #include <QByteArray>
+#include <QPoint>
 
 ReaderGUI::ReaderGUI(QWidget *parent, QSqlDatabase database) :
     QMainWindow(parent),
@@ -96,7 +97,6 @@ void ReaderGUI::initializeQuotes() {
     QString quote = quoteQuery.value(0).toString();
     QString author = quoteQuery.value(1).toString();
     ui->quotesLabel->setText("'" + quote + "'\n - " + author);
-    this->show();
 }
 void ReaderGUI::initializeGUILogic(QSqlDatabase database) {
     initializeDatabase(database);
@@ -158,4 +158,7 @@ void ReaderGUI::on_avatarChanged(const QPixmap* pixmap) {
 void ReaderGUI::on_chuyenVaiTroButton_clicked()
 {
     emit chuyenVaiTro();
+}
+void ReaderGUI::on_actionAbout_LIBPRO_triggered() {
+    emit aboutTriggered();
 }

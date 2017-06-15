@@ -602,10 +602,16 @@ color: black;</string>
     <property name="title">
      <string>About</string>
     </property>
+    <addaction name="actionAbout_LIBPRO"/>
    </widget>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionAbout_LIBPRO">
+   <property name="text">
+    <string>About LIBPRO</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>thanhTimKiem</tabstop>
