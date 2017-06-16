@@ -24,25 +24,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-    readergui.cpp \
     bookdelegate.cpp \
     information.cpp \
     introform.cpp \
-    managergui.cpp \
     accountdelegate.cpp \
     accountchooser.cpp \
-    librariangui.cpp \
     about.cpp \
     mainwindow.cpp
 
 HEADERS  += introform.h \
-    readergui.h \
     bookdelegate.h \
     information.h \
-    managergui.h \
     accountdelegate.h \
     accountchooser.h \
-    librariangui.h \
     about.h \
     mainwindow.h
 
