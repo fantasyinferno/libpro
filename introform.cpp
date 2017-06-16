@@ -11,7 +11,6 @@
 #include <QFileDialog>
 #include <QSqlError>
 #include <QBuffer>
-#include "readergui.h"
 
 IntroForm::IntroForm(QWidget *parent, QSqlDatabase database) :
     QDialog(parent),

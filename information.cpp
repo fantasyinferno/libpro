@@ -15,7 +15,6 @@
 #include <QSqlRelation>
 #include <QList>
 #include "accountdelegate.h"
-#include "readergui.h"
 
 Information::Information(QWidget *parent, QSqlDatabase database) :
     QDialog(parent),

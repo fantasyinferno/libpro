@@ -120,6 +120,9 @@ void MainWindow::on_dangXuatButton_clicked()
     ui->dangKyButton->show();
     ui->dangNhapButton->show();
     ui->avatarIcon->clear();
+    ui->toolBox->setItemEnabled(0, true);
+    ui->toolBox->setItemEnabled(1, false);
+    ui->toolBox->setItemEnabled(2, false);
     emit dangXuat();
 }
 
