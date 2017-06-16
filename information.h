@@ -7,6 +7,7 @@
 #include <QItemSelection>
 #include <QDataWidgetMapper>
 #include <QSqlRelationalTableModel>
+#include <QList>
 
 namespace Ui {
 class Information;
@@ -38,12 +39,14 @@ private slots:
     void on_iAmYourParent(QWidget*);
 signals:
     void avatarChanged(const QPixmap* pixmap);
+    void rolesLoaded(QList<int>);
 private:
     QSqlDatabase db;
     Ui::Information *ui;
     QSqlRelationalTableModel *model, *bookModel;
     QDataWidgetMapper *mapper;
     QString user;
+    QList<int> rolesList;
     int user_id;
 };
 

@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     accountdelegate.cpp \
     accountchooser.cpp \
     librariangui.cpp \
-    about.cpp
+    about.cpp \
+    mainwindow.cpp
 
 HEADERS  += introform.h \
     readergui.h \
@@ -42,7 +43,8 @@ HEADERS  += introform.h \
     accountdelegate.h \
     accountchooser.h \
     librariangui.h \
-    about.h
+    about.h \
+    mainwindow.h
 
 FORMS    += \
     readergui.ui \
@@ -51,7 +53,8 @@ FORMS    += \
     managergui.ui \
     accountchooser.ui \
     librariangui.ui \
-    about.ui
+    about.ui \
+    mainwindow.ui
 
 RESOURCES += \
     resources.qrc

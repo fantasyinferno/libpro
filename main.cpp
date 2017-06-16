@@ -4,9 +4,7 @@
 #include "information.h"
 #include "introform.h"
 #include "accountchooser.h"
-#include "readergui.h"
-#include "managergui.h"
-#include "librariangui.h"
+#include "mainwindow.h"
 #include "about.h"
 int main(int argc, char *argv[])
 {
@@ -16,46 +14,26 @@ int main(int argc, char *argv[])
     if (!db.open()) {
         return -1;
     }
-    ReaderGUI readerGUI(0, db);
-    LibrarianGUI librarianGUI(0, db);
-    IntroForm introForm(&readerGUI, db);
-    Information information(&readerGUI, db);
-    AccountChooser accountChooser(&readerGUI, db);
-    About about(&readerGUI);
+    MainWindow mainWindow(0, db);
+    IntroForm introForm(&mainWindow, db);
+    Information information(&mainWindow, db);
+    About about(&mainWindow);
     introForm.setWindowTitle("Đăng nhập/Đăng ký");
     information.setWindowTitle("Thông tin cá nhân");
-    accountChooser.setWindowTitle("Thay đổi tài khoản");
-    QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &readerGUI, SLOT(on_dangNhapThanhCong(int, QString)));
-    QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &librarianGUI, SLOT(on_dangNhapThanhCong(int, QString)));
+    about.setWindowTitle("Về LIBPRO");
+    QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &mainWindow, SLOT(on_dangNhapThanhCong(int, QString)));
     QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &information, SLOT(on_dangNhapThanhCong(int, QString)));
-    QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &accountChooser, SLOT(on_dangNhapThanhCong(int, QString)));
-    QObject::connect(&information, SIGNAL(avatarChanged(const QPixmap*)), &readerGUI, SLOT(on_avatarChanged(const QPixmap*)));
-    QObject::connect(&readerGUI, SIGNAL(updateMyBooks(const QModelIndexList&)), &information, SLOT(on_updateMyBooks(const QModelIndexList&)));
-    QObject::connect(&readerGUI, SIGNAL(dangXuat()), &information, SLOT(on_dangXuat()));
-    QObject::connect(&readerGUI, SIGNAL(chuyenVaiTro()), &accountChooser, SLOT(show()));
-    QObject::connect(&readerGUI, SIGNAL(formRequest(int)), &introForm, SLOT(on_formRequest(int)));
-    QObject::connect(&readerGUI, SIGNAL(informationRequest()), &information, SLOT(on_informationRequest()));
-    QObject::connect(&readerGUI, SIGNAL(aboutTriggered()), &about, SLOT(show()));
-    QObject::connect(&librarianGUI, SIGNAL(updateMyBooks(const QModelIndexList&)), &information, SLOT(on_updateMyBooks(const QModelIndexList&)));
-    QObject::connect(&librarianGUI, SIGNAL(dangXuat()), &information, SLOT(on_dangXuat()));
-    QObject::connect(&librarianGUI, SIGNAL(chuyenVaiTro()), &accountChooser, SLOT(show()));
-    QObject::connect(&librarianGUI, SIGNAL(formRequest(int)), &introForm, SLOT(on_formRequest(int)));
-    QObject::connect(&librarianGUI, SIGNAL(informationRequest()), &information, SLOT(on_informationRequest()));
-    QObject::connect(&librarianGUI, SIGNAL(aboutTriggered()), &about, SLOT(show()));
-    QObject::connect(&accountChooser, SIGNAL(roleChosen(int)), &librarianGUI, SLOT(on_roleChosen(int)));
-    QObject::connect(&accountChooser, SIGNAL(roleChosen(int)), &readerGUI, SLOT(on_roleChosen(int)));
-    QObject::connect(&readerGUI, SIGNAL(iAmYourParent(QWidget*)), &introForm, SLOT(on_iAmYourParent(QWidget*)));
-    QObject::connect(&readerGUI, SIGNAL(iAmYourParent(QWidget*)), &information, SLOT(on_iAmYourParent(QWidget*)));
-    QObject::connect(&librarianGUI, SIGNAL(iAmYourParent(QWidget*)), &introForm, SLOT(on_iAmYourParent(QWidget*)));
-    QObject::connect(&librarianGUI, SIGNAL(iAmYourParent(QWidget*)), &information, SLOT(on_iAmYourParent(QWidget*)));
-    //managerGUI.show();
-    librarianGUI.hide();
-    readerGUI.show();
+    QObject::connect(&information, SIGNAL(avatarChanged(const QPixmap*)), &mainWindow, SLOT(on_avatarChanged(const QPixmap*)));
+    QObject::connect(&mainWindow, SIGNAL(updateMyBooks(const QModelIndexList&)), &information, SLOT(on_updateMyBooks(const QModelIndexList&)));
+    QObject::connect(&mainWindow, SIGNAL(dangXuat()), &information, SLOT(on_dangXuat()));
+    QObject::connect(&mainWindow, SIGNAL(formRequest(int)), &introForm, SLOT(on_formRequest(int)));
+    QObject::connect(&mainWindow, SIGNAL(informationRequest()), &information, SLOT(on_informationRequest()));
+    QObject::connect(&mainWindow, SIGNAL(aboutTriggered()), &about, SLOT(show()));
+    QObject::connect(&information, SIGNAL(rolesLoaded(QList<int>)), &mainWindow, SLOT(on_rolesLoaded(QList<int>)));
     QIcon icon(":/media/images/logo.png");
     a.setWindowIcon(icon);
-    readerGUI.setWindowTitle("LIBPRO");
-    librarianGUI.setWindowTitle("LIBPRO");
-//  QObject::connect(&introForm, SIGNAL(dangNhapClicked(const QString)), &readerGUI, SLOT(on_display(const QString)));
+    mainWindow.setWindowTitle("LIBPRO");
+    mainWindow.show();
     return a.exec();
 }
 

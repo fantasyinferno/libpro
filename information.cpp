@@ -13,6 +13,7 @@
 #include <QFileDialog>
 #include <QBuffer>
 #include <QSqlRelation>
+#include <QList>
 #include "accountdelegate.h"
 #include "readergui.h"
 
@@ -23,7 +24,6 @@ Information::Information(QWidget *parent, QSqlDatabase database) :
     ui->setupUi(this);
     this->setModal(true);
     db = database;
-
     enableEdit(false);
     // Model cho thông tin cá nhân
     model = new QSqlRelationalTableModel(0, db);
@@ -103,12 +103,12 @@ void Information::checkVt() {
     QSqlQuery query(0, db);
 
 
-    query.prepare("SELECT * FROM account_role WHERE account_id = :id");
+    query.prepare("SELECT role_id FROM account_role WHERE account_id = :id");
     query.bindValue(":id", user_id);
     query.exec();
 
     while (query.next()) {
-        int role = query.value(1).toInt();
+        int role = query.value(0).toInt();
         if (role == 1) {
             ui->ip_vt_reader->setChecked(true);
         } else if (role == 2) {
@@ -116,7 +116,9 @@ void Information::checkVt() {
         } else {
             ui->ip_vt_manager->setChecked(true);
         }
+        rolesList.append(role);
     }
+    emit rolesLoaded(rolesList);
 }
 
 //*************************************************************
