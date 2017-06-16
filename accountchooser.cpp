@@ -38,3 +38,13 @@ AccountChooser::on_dangNhapThanhCong(int id, QString username) {
         }
     }
 }
+
+void AccountChooser::on_docGiaButton_clicked()
+{
+    emit roleChosen(1);
+}
+
+void AccountChooser::on_thuThuButton_clicked()
+{
+    emit roleChosen(2);
+}

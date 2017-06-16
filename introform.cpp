@@ -155,3 +155,9 @@ void IntroForm::on_formRequest(int tab) {
     this->setTab(tab);
     this->show();
 }
+
+void IntroForm::on_iAmYourParent(QWidget *widget)
+{
+    this->setParent(widget);
+    this->setWindowFlags(Qt::Dialog);
+}

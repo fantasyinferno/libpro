@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
     information.setWindowTitle("Thông tin cá nhân");
     accountChooser.setWindowTitle("Thay đổi tài khoản");
     QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &readerGUI, SLOT(on_dangNhapThanhCong(int, QString)));
+    QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &librarianGUI, SLOT(on_dangNhapThanhCong(int, QString)));
     QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &information, SLOT(on_dangNhapThanhCong(int, QString)));
     QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &accountChooser, SLOT(on_dangNhapThanhCong(int, QString)));
     QObject::connect(&information, SIGNAL(avatarChanged(const QPixmap*)), &readerGUI, SLOT(on_avatarChanged(const QPixmap*)));
@@ -35,7 +36,18 @@ int main(int argc, char *argv[])
     QObject::connect(&readerGUI, SIGNAL(formRequest(int)), &introForm, SLOT(on_formRequest(int)));
     QObject::connect(&readerGUI, SIGNAL(informationRequest()), &information, SLOT(on_informationRequest()));
     QObject::connect(&readerGUI, SIGNAL(aboutTriggered()), &about, SLOT(show()));
+    QObject::connect(&librarianGUI, SIGNAL(updateMyBooks(const QModelIndexList&)), &information, SLOT(on_updateMyBooks(const QModelIndexList&)));
+    QObject::connect(&librarianGUI, SIGNAL(dangXuat()), &information, SLOT(on_dangXuat()));
+    QObject::connect(&librarianGUI, SIGNAL(chuyenVaiTro()), &accountChooser, SLOT(show()));
+    QObject::connect(&librarianGUI, SIGNAL(formRequest(int)), &introForm, SLOT(on_formRequest(int)));
+    QObject::connect(&librarianGUI, SIGNAL(informationRequest()), &information, SLOT(on_informationRequest()));
     QObject::connect(&librarianGUI, SIGNAL(aboutTriggered()), &about, SLOT(show()));
+    QObject::connect(&accountChooser, SIGNAL(roleChosen(int)), &librarianGUI, SLOT(on_roleChosen(int)));
+    QObject::connect(&accountChooser, SIGNAL(roleChosen(int)), &readerGUI, SLOT(on_roleChosen(int)));
+    QObject::connect(&readerGUI, SIGNAL(iAmYourParent(QWidget*)), &introForm, SLOT(on_iAmYourParent(QWidget*)));
+    QObject::connect(&readerGUI, SIGNAL(iAmYourParent(QWidget*)), &information, SLOT(on_iAmYourParent(QWidget*)));
+    QObject::connect(&librarianGUI, SIGNAL(iAmYourParent(QWidget*)), &introForm, SLOT(on_iAmYourParent(QWidget*)));
+    QObject::connect(&librarianGUI, SIGNAL(iAmYourParent(QWidget*)), &information, SLOT(on_iAmYourParent(QWidget*)));
     //managerGUI.show();
     librarianGUI.hide();
     readerGUI.show();

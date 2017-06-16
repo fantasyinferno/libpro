@@ -162,3 +162,15 @@ void ReaderGUI::on_chuyenVaiTroButton_clicked()
 void ReaderGUI::on_actionAbout_LIBPRO_triggered() {
     emit aboutTriggered();
 }
+
+void ReaderGUI::on_roleChosen(int role_id)
+{
+    if (role_id == 1) {
+        this->show();
+        emit iAmYourParent(this);
+    } else {
+        if (!this->isHidden()) {
+            this->hide();
+        }
+    }
+}

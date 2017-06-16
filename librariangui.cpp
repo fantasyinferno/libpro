@@ -152,3 +152,15 @@ void LibrarianGUI::on_chuyenVaiTroButton_clicked()
 void LibrarianGUI::on_actionAbout_LIBPRO_triggered() {
     emit aboutTriggered();
 }
+
+void LibrarianGUI::on_roleChosen(int role_id)
+{
+    if (role_id == 2) {
+        this->show();
+        emit iAmYourParent(this);
+    } else {
+        if (!this->isHidden()) {
+            this->hide();
+        }
+    }
+}

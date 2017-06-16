@@ -35,6 +35,7 @@ private slots:
     void on_currentIndexChanged(int);
     void on_informationRequest();
     void on_dangXuat();
+    void on_iAmYourParent(QWidget*);
 signals:
     void avatarChanged(const QPixmap* pixmap);
 private:

@@ -42,6 +42,7 @@ signals:
     void dangXuat();
     void informationRequest();
     void aboutTriggered();
+    void iAmYourParent(QWidget*);
 private slots:
     void on_thanhTimKiem_returnPressed();
     void on_muon();
@@ -54,6 +55,7 @@ private slots:
     void on_avatarChanged(const QPixmap*);
     void on_chuyenVaiTroButton_clicked();
     void on_actionAbout_LIBPRO_triggered();
+    void on_roleChosen(int);
 };
 
 #endif // READERGUI_H

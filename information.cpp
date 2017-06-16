@@ -284,3 +284,9 @@ void Information::on_dangXuat() {
     bookModel->select();
     mapper->toFirst();
 }
+
+void Information::on_iAmYourParent(QWidget *widget)
+{
+    this->setParent(widget);
+    this->setWindowFlags(Qt::Dialog);
+}

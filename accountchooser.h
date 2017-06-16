@@ -21,6 +21,12 @@ private:
     QSqlDatabase db;
 private slots:
     on_dangNhapThanhCong(int, QString);
+    void on_docGiaButton_clicked();
+
+    void on_thuThuButton_clicked();
+
+signals:
+    roleChosen(int);
 };
 
 #endif // ACCOUNTCHOOSER_H
