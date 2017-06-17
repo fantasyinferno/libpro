@@ -39,7 +39,7 @@ private slots:
     void on_iAmYourParent(QWidget*);
 signals:
     void avatarChanged(const QPixmap* pixmap);
-    void rolesLoaded(QList<int>);
+    void rolesLoaded(QList<int>&);
 private:
     QSqlDatabase db;
     Ui::Information *ui;

@@ -37,6 +37,7 @@ private:
     QString user;
     int user_id;
     // Vai trò
+    QList<int> rolesList;
 signals:
     void updateMyBooks(const QModelIndexList&);
     void formRequest(int);
@@ -52,7 +53,8 @@ private slots:
     void on_username_clicked();
     void on_avatarChanged(const QPixmap*);
     void on_actionAbout_LIBPRO_triggered();
-    void on_rolesLoaded(QList<int>);
+    void on_rolesLoaded(QList<int>&);
+    void on_muonButton_clicked();
 };
 
 

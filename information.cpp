@@ -25,7 +25,7 @@ Information::Information(QWidget *parent, QSqlDatabase database) :
     db = database;
     enableEdit(false);
     // Model cho thông tin cá nhân
-    model = new QSqlRelationalTableModel(0, db);
+    model = new QSqlRelationalTableModel(this, db);
     model->setTable("account");
     int genderIdx = model->fieldIndex("gender_id");
     int statusIdx = model->fieldIndex("status_id");

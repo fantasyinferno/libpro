@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     QObject::connect(&mainWindow, SIGNAL(formRequest(int)), &introForm, SLOT(on_formRequest(int)));
     QObject::connect(&mainWindow, SIGNAL(informationRequest()), &information, SLOT(on_informationRequest()));
     QObject::connect(&mainWindow, SIGNAL(aboutTriggered()), &about, SLOT(show()));
-    QObject::connect(&information, SIGNAL(rolesLoaded(QList<int>)), &mainWindow, SLOT(on_rolesLoaded(QList<int>)));
+    QObject::connect(&information, SIGNAL(rolesLoaded(QList<int>&)), &mainWindow, SLOT(on_rolesLoaded(QList<int>&)));
     QIcon icon(":/media/images/logo.png");
     a.setWindowIcon(icon);
     mainWindow.setWindowTitle("LIBPRO");

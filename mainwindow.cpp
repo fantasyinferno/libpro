@@ -46,7 +46,7 @@ void MainWindow::initializeDatabase(QSqlDatabase database = QSqlDatabase()) {
 void MainWindow::initializeTable()
 {
     // Thiết lập model
-    model = new QSqlTableModel(new QObject(), db);
+    model = new QSqlTableModel(this, db);
     model->setTable("book");
     model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ISBN"));
@@ -157,10 +157,10 @@ void MainWindow::on_actionAbout_LIBPRO_triggered() {
     emit aboutTriggered();
 }
 
-void MainWindow::on_rolesLoaded(QList<int> rolesList)
+void MainWindow::on_rolesLoaded(QList<int>& list)
 {
-    for (int p: rolesList) {
-        qDebug() << p;
+    rolesList = list;
+    for (int p: (rolesList)) {
         ui->toolBox->setItemEnabled(p - 1, true);
     }
     if (rolesList.contains(2)) {
@@ -168,5 +168,23 @@ void MainWindow::on_rolesLoaded(QList<int> rolesList)
         ui->danhMucSach->setSelectionBehavior(QAbstractItemView::SelectItems);
         ui->thayDoiSachButton->show();
         ui->themSachButton->show();
+    }
+}
+
+void MainWindow::on_muonButton_clicked()
+{
+
+    QModelIndexList list = ui->danhMucSach->selectionModel()->selectedRows(0);
+    if (!list.isEmpty()) {
+        QSqlQuery query(0, db);
+        query.prepare("INSERT INTO account_book(account_id, book_id, book_status) VALUES(?, ?, ?)");
+        for (QModelIndex index: list) {
+            query.addBindValue(user_id);
+            query.addBindValue(index.data().toString());
+            query.addBindValue(0);
+            if (!query.exec()) {
+                qDebug() << query.lastError();
+            }
+        }
     }
 }

@@ -177,7 +177,7 @@ color: white;</string>
          <string notr="true">background:#495057;</string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="sachPage">
          <property name="enabled">
@@ -658,7 +658,7 @@ color: black;</string>
              <string notr="true">color: black;</string>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="tab_4">
              <attribute name="title">
@@ -666,7 +666,7 @@ color: black;</string>
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
-               <widget class="QTableView" name="tableView_4">
+               <widget class="QTableView" name="yeuCauMuonSach">
                 <property name="styleSheet">
                  <string notr="true">background: white;</string>
                 </property>
@@ -680,7 +680,7 @@ color: black;</string>
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
-               <widget class="QTableView" name="tableView_5">
+               <widget class="QTableView" name="sachQuaHan">
                 <property name="styleSheet">
                  <string notr="true">background: white;</string>
                 </property>
@@ -694,7 +694,7 @@ color: black;</string>
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_6">
               <item>
-               <widget class="QTableView" name="tableView_6">
+               <widget class="QTableView" name="sachBiMat">
                 <property name="styleSheet">
                  <string notr="true">background: white;</string>
                 </property>
