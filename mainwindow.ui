@@ -658,19 +658,66 @@ color: black;</string>
              <string notr="true">color: black;</string>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="tab_4">
              <attribute name="title">
               <string>Yêu cầu mượn sách</string>
              </attribute>
-             <layout class="QVBoxLayout" name="verticalLayout_4">
+             <layout class="QVBoxLayout" name="verticalLayout_12">
               <item>
-               <widget class="QTableView" name="yeuCauMuonSach">
-                <property name="styleSheet">
-                 <string notr="true">background: white;</string>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <widget class="QTableView" name="yeuCauMuonSach">
+                  <property name="styleSheet">
+                   <string notr="true">background: white;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_11">
+                  <item>
+                   <widget class="QPushButton" name="chapThuanButton">
+                    <property name="text">
+                     <string>Chấp thuận</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="tuChoiButton">
+                    <property name="text">
+                     <string>Từ chối</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab">
+             <attribute name="title">
+              <string>Sách đang mượn</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_16">
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_15">
+                <item>
+                 <widget class="QTableView" name="sachDangMuon">
+                  <property name="styleSheet">
+                   <string notr="true">background: white;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="xacNhanSachDaTraButton">
+                  <property name="text">
+                   <string>Xác nhận sách đã trả</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -678,13 +725,42 @@ color: black;</string>
              <attribute name="title">
               <string>Sách quá hạn</string>
              </attribute>
-             <layout class="QVBoxLayout" name="verticalLayout_5">
+             <layout class="QVBoxLayout" name="verticalLayout_13">
               <item>
-               <widget class="QTableView" name="sachQuaHan">
-                <property name="styleSheet">
-                 <string notr="true">background: white;</string>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <widget class="QTableView" name="sachQuaHan">
+                  <property name="styleSheet">
+                   <string notr="true">background: white;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_12">
+                  <item>
+                   <widget class="QPushButton" name="phatButton">
+                    <property name="text">
+                     <string>Phạt</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="canhCaoButton">
+                    <property name="text">
+                     <string>Cảnh cáo</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="nhacNhoButton">
+                    <property name="text">
+                     <string>Nhắc nhở</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -692,13 +768,24 @@ color: black;</string>
              <attribute name="title">
               <string>Sách bị mất</string>
              </attribute>
-             <layout class="QVBoxLayout" name="verticalLayout_6">
+             <layout class="QVBoxLayout" name="verticalLayout_14">
               <item>
-               <widget class="QTableView" name="sachBiMat">
-                <property name="styleSheet">
-                 <string notr="true">background: white;</string>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <item>
+                 <widget class="QTableView" name="sachBiMat">
+                  <property name="styleSheet">
+                   <string notr="true">background: white;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="phatButton2">
+                  <property name="text">
+                   <string>Phạt</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>

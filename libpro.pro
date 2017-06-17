@@ -41,12 +41,9 @@ HEADERS  += introform.h \
     mainwindow.h
 
 FORMS    += \
-    readergui.ui \
     information.ui \
     introform.ui \
-    managergui.ui \
     accountchooser.ui \
-    librariangui.ui \
     about.ui \
     mainwindow.ui
 

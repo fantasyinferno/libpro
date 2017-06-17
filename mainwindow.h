@@ -31,6 +31,7 @@ private:
     Ui::MainWindow *ui;
     // Model thể hiện thông tin lấy từ cơ sở dữ liệu
     QSqlTableModel *model;
+    QSqlTableModel *requestBookModel;
     // Cơ sở dữ liệu.
     QSqlDatabase db;
     // Tên truy cập và id
@@ -55,6 +56,9 @@ private slots:
     void on_actionAbout_LIBPRO_triggered();
     void on_rolesLoaded(QList<int>&);
     void on_muonButton_clicked();
+    void on_tabWidget_currentChanged(int index);
+    void on_chapThuanButton_clicked();
+    void on_tuChoiButton_clicked();
 };
 
 

@@ -10,6 +10,7 @@
 #include <QDate>
 #include <QSqlRecord>
 #include <QSqlError>
+#include <QMessageBox>
 #include <QByteArray>
 
 MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
@@ -168,6 +169,39 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         ui->danhMucSach->setSelectionBehavior(QAbstractItemView::SelectItems);
         ui->thayDoiSachButton->show();
         ui->themSachButton->show();
+        requestBookModel = new QSqlTableModel(this, db);
+        requestBookModel->setTable("account_book");
+        requestBookModel->setHeaderData(requestBookModel->fieldIndex("book_id"), Qt::Horizontal, tr("ISBN"));
+        requestBookModel->setHeaderData(requestBookModel->fieldIndex("account_id"), Qt::Horizontal, tr("Người mượn"));
+        requestBookModel->setHeaderData(requestBookModel->fieldIndex("start_date"), Qt::Horizontal, tr("Ngày ký mượn"));
+        requestBookModel->setHeaderData(requestBookModel->fieldIndex("due_date"), Qt::Horizontal, tr("Ngày cần trả"));
+
+        ui->yeuCauMuonSach->setModel(requestBookModel);
+        ui->yeuCauMuonSach->setItemDelegate(new QSqlRelationalDelegate(this));
+        ui->yeuCauMuonSach->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui->yeuCauMuonSach->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->yeuCauMuonSach->setColumnHidden(requestBookModel->fieldIndex("start_date"), true);
+        ui->yeuCauMuonSach->setColumnHidden(requestBookModel->fieldIndex("due_date"), true);
+        ui->yeuCauMuonSach->setColumnHidden(requestBookModel->fieldIndex("book_status_id"), true);
+
+        ui->sachDangMuon->setModel(requestBookModel);
+        ui->sachDangMuon->setItemDelegate(new QSqlRelationalDelegate(this));
+        ui->sachDangMuon->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui->sachDangMuon->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->sachDangMuon->setColumnHidden(requestBookModel->fieldIndex("book_status_id"), true);
+
+        ui->sachBiMat->setModel(requestBookModel);
+        ui->sachBiMat->setItemDelegate(new QSqlRelationalDelegate(this));
+        ui->sachBiMat->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui->sachBiMat->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->sachBiMat->setColumnHidden(requestBookModel->fieldIndex("book_status_id"), true);
+
+        ui->sachQuaHan->setModel(requestBookModel);
+        ui->sachQuaHan->setItemDelegate(new QSqlRelationalDelegate(this));
+        ui->sachQuaHan->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui->sachQuaHan->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->sachQuaHan->setColumnHidden(requestBookModel->fieldIndex("book_status_id"), true);
+
     }
 }
 
@@ -177,14 +211,63 @@ void MainWindow::on_muonButton_clicked()
     QModelIndexList list = ui->danhMucSach->selectionModel()->selectedRows(0);
     if (!list.isEmpty()) {
         QSqlQuery query(0, db);
-        query.prepare("INSERT INTO account_book(account_id, book_id, book_status) VALUES(?, ?, ?)");
+        query.prepare("INSERT INTO account_book(account_id, book_id, book_status_id) VALUES(?, ?, ?)");
         for (QModelIndex index: list) {
             query.addBindValue(user_id);
             query.addBindValue(index.data().toString());
-            query.addBindValue(0);
+            query.addBindValue(1);
             if (!query.exec()) {
                 qDebug() << query.lastError();
             }
         }
+    }
+}
+
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    if (index == 0) {
+        // Yêu cầu mượn
+        requestBookModel->setFilter("book_status_id = 1");
+        requestBookModel->select();
+    } else if (index == 1) {
+        // Sách đang mượn
+        requestBookModel->setFilter("book_status_id = 2");
+        requestBookModel->select();
+
+
+    } else if (index == 2) {
+        // Sách quá hạn
+        requestBookModel->setFilter("julianday(due_date) - julianday(current_date)");
+        requestBookModel->select();
+
+    } else {
+        // Sách bị mất
+        requestBookModel->setFilter("book_status_id = 4");
+        requestBookModel->select();
+
+    }
+}
+
+void MainWindow::on_chapThuanButton_clicked()
+{
+    QModelIndexList list = ui->yeuCauMuonSach->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status_id"));
+    if (!list.isEmpty()) {
+        for (QModelIndex i: list) {
+            requestBookModel->setData(i, 2);
+        }
+        QMessageBox::information(this, "Thành công!", "Bạn đã cho phép độc giả mượn sách!");
+        // Gửi tin nhắn đến thành viên
+    }
+}
+
+void MainWindow::on_tuChoiButton_clicked()
+{
+    QModelIndexList list = ui->yeuCauMuonSach->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status_id"));
+    if (!list.isEmpty()) {
+        for (QModelIndex i: list) {
+            requestBookModel->removeRow(i.row());
+        }
+        QMessageBox::information(this, "Thành công!", "Bạn đã từ chối yêu cầu của độc giả!");
+        // Gửi tin nhắn đến thành viên
     }
 }
