@@ -12,6 +12,8 @@
 #include <QSqlError>
 #include <QMessageBox>
 #include <QByteArray>
+#include <QSqlRelation>
+#include <QSqlRelationalTableModel>
 
 MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
     QMainWindow(parent),
@@ -169,38 +171,24 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         ui->danhMucSach->setSelectionBehavior(QAbstractItemView::SelectItems);
         ui->thayDoiSachButton->show();
         ui->themSachButton->show();
-        requestBookModel = new QSqlTableModel(this, db);
+        requestBookModel = new QSqlRelationalTableModel(this, db);
         requestBookModel->setTable("account_book");
-        requestBookModel->setHeaderData(requestBookModel->fieldIndex("book_id"), Qt::Horizontal, tr("ISBN"));
-        requestBookModel->setHeaderData(requestBookModel->fieldIndex("account_id"), Qt::Horizontal, tr("Người mượn"));
+        bookIdIdx = requestBookModel->fieldIndex("book_id");
+        accountIdIdx = requestBookModel->fieldIndex("account_id");
+        bookStatusIdIdx = requestBookModel->fieldIndex("book_status_id");
+        requestBookModel->setRelation(bookIdIdx, QSqlRelation("book", "book_id", "title"));
+        requestBookModel->setRelation(accountIdIdx, QSqlRelation("account", "account_id", "account"));
+        requestBookModel->setRelation(bookStatusIdIdx, QSqlRelation("book_status", "book_status_id", "book_status"));
+        requestBookModel->setHeaderData(bookIdIdx, Qt::Horizontal, tr("ISBN"));
+        requestBookModel->setHeaderData(accountIdIdx, Qt::Horizontal, tr("Người mượn"));
         requestBookModel->setHeaderData(requestBookModel->fieldIndex("start_date"), Qt::Horizontal, tr("Ngày ký mượn"));
         requestBookModel->setHeaderData(requestBookModel->fieldIndex("due_date"), Qt::Horizontal, tr("Ngày cần trả"));
+        requestBookModel->setHeaderData(bookStatusIdIdx, Qt::Horizontal, tr("Trạng thái"));
 
-        ui->yeuCauMuonSach->setModel(requestBookModel);
-        ui->yeuCauMuonSach->setItemDelegate(new QSqlRelationalDelegate(this));
-        ui->yeuCauMuonSach->setSelectionBehavior(QAbstractItemView::SelectRows);
-        ui->yeuCauMuonSach->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        ui->yeuCauMuonSach->setColumnHidden(requestBookModel->fieldIndex("start_date"), true);
-        ui->yeuCauMuonSach->setColumnHidden(requestBookModel->fieldIndex("due_date"), true);
-        ui->yeuCauMuonSach->setColumnHidden(requestBookModel->fieldIndex("book_status_id"), true);
-
-        ui->sachDangMuon->setModel(requestBookModel);
-        ui->sachDangMuon->setItemDelegate(new QSqlRelationalDelegate(this));
-        ui->sachDangMuon->setSelectionBehavior(QAbstractItemView::SelectRows);
-        ui->sachDangMuon->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        ui->sachDangMuon->setColumnHidden(requestBookModel->fieldIndex("book_status_id"), true);
-
-        ui->sachBiMat->setModel(requestBookModel);
-        ui->sachBiMat->setItemDelegate(new QSqlRelationalDelegate(this));
-        ui->sachBiMat->setSelectionBehavior(QAbstractItemView::SelectRows);
-        ui->sachBiMat->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        ui->sachBiMat->setColumnHidden(requestBookModel->fieldIndex("book_status_id"), true);
-
-        ui->sachQuaHan->setModel(requestBookModel);
-        ui->sachQuaHan->setItemDelegate(new QSqlRelationalDelegate(this));
-        ui->sachQuaHan->setSelectionBehavior(QAbstractItemView::SelectRows);
-        ui->sachQuaHan->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        ui->sachQuaHan->setColumnHidden(requestBookModel->fieldIndex("book_status_id"), true);
+        requestBookModel->select();
+        ui->yeuCau->setModel(requestBookModel);
+        ui->yeuCau->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->yeuCau->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     }
 }
@@ -223,34 +211,9 @@ void MainWindow::on_muonButton_clicked()
     }
 }
 
-void MainWindow::on_tabWidget_currentChanged(int index)
-{
-    if (index == 0) {
-        // Yêu cầu mượn
-        requestBookModel->setFilter("book_status_id = 1");
-        requestBookModel->select();
-    } else if (index == 1) {
-        // Sách đang mượn
-        requestBookModel->setFilter("book_status_id = 2");
-        requestBookModel->select();
-
-
-    } else if (index == 2) {
-        // Sách quá hạn
-        requestBookModel->setFilter("julianday(due_date) - julianday(current_date)");
-        requestBookModel->select();
-
-    } else {
-        // Sách bị mất
-        requestBookModel->setFilter("book_status_id = 4");
-        requestBookModel->select();
-
-    }
-}
-
 void MainWindow::on_chapThuanButton_clicked()
 {
-    QModelIndexList list = ui->yeuCauMuonSach->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status_id"));
+    QModelIndexList list = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status_id"));
     if (!list.isEmpty()) {
         for (QModelIndex i: list) {
             requestBookModel->setData(i, 2);
@@ -262,7 +225,7 @@ void MainWindow::on_chapThuanButton_clicked()
 
 void MainWindow::on_tuChoiButton_clicked()
 {
-    QModelIndexList list = ui->yeuCauMuonSach->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status_id"));
+    QModelIndexList list = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status_id"));
     if (!list.isEmpty()) {
         for (QModelIndex i: list) {
             requestBookModel->removeRow(i.row());
