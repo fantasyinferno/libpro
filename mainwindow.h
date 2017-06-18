@@ -71,6 +71,7 @@ private slots:
     void initializeQuotes();
     void initializeButtons();
     void enableLibrarianButtons(bool, bool, bool, bool);
+    void on_themSachButton_clicked();
 };
 
 

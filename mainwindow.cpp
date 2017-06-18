@@ -14,6 +14,7 @@
 #include <QByteArray>
 #include <QSqlRelation>
 #include <QSqlRelationalTableModel>
+#include "addbook.h"
 #include "finedialog.h"
 
 MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
@@ -22,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
 {
     ui->setupUi(this);
     initializeGUILogic(database);
+    user_id = 0;
+    user = "";
 }
 
 MainWindow::~MainWindow()
@@ -130,7 +133,10 @@ void MainWindow::initializeGUILogic(QSqlDatabase database) {
 
 void MainWindow::on_dangXuatButton_clicked()
 {
+    // Bỏ trống user và user_id
     user = "";
+    user_id = 0;
+    // Thay đổi giao diện về lại ban đầu
     ui->username->setText("");
     ui->username->setEnabled(false);
     ui->dangXuatButton->hide();
@@ -138,6 +144,7 @@ void MainWindow::on_dangXuatButton_clicked()
     ui->dangNhapButton->show();
     ui->avatarIcon->clear();
     ui->toolBox->setItemEnabled(0, true);
+    // Nếu có role thủ thư thì rollback những gì của thủ thư
     if (rolesList.contains(2)) {
         // Làm ngược lại với on_rolesLoaded()
         ui->toolBox->setItemEnabled(1, false);
@@ -145,6 +152,7 @@ void MainWindow::on_dangXuatButton_clicked()
         ui->danhMucSach->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->thayDoiSachButton->hide();
         ui->themSachButton->hide();
+        ui->tabWidget->setCurrentIndex(0);
         ui->muonSachTable->setModel(0);
         ui->dangMuonTable->setModel(0);
         ui->matSachTable->setModel(0);
@@ -230,24 +238,28 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
 
 void MainWindow::on_muonButton_clicked()
 {
-    QModelIndexList list = ui->danhMucSach->selectionModel()->selectedRows(0);
-    if (!list.isEmpty()) {
-        QSqlQuery query(0, db);
-        query.prepare("INSERT INTO account_book(account_id, book_id, book_status_id) VALUES(?, ?, ?)");
-        bool ok = false;
-        for (QModelIndex index: list) {
-            query.addBindValue(user_id);
-            query.addBindValue(index.data().toString());
-            query.addBindValue(1);
-            if (!(ok = query.exec())) {
-                qDebug() << query.lastError();
+    if (user_id < 0) {
+        QModelIndexList list = ui->danhMucSach->selectionModel()->selectedRows(0);
+        if (!list.isEmpty()) {
+            QSqlQuery query(0, db);
+            query.prepare("INSERT INTO account_book(account_id, book_id, book_status_id) VALUES(?, ?, ?)");
+            bool ok = false;
+            for (QModelIndex index: list) {
+                query.addBindValue(user_id);
+                query.addBindValue(index.data().toString());
+                query.addBindValue(1);
+                if (!(ok = query.exec())) {
+                    qDebug() << query.lastError();
+                }
+            }
+            if (ok) {
+                QMessageBox::information(this, "Mượn sách", "Bạn đã gửi yêu cầu mượn sách!");
+            } else {
+                QMessageBox::warning(this, "Mượn sách", "Đã có lỗi xảy ra!");
             }
         }
-        if (ok) {
-            QMessageBox::information(this, "Mượn sách", "Bạn đã gửi yêu cầu mượn sách!");
-        } else {
-            QMessageBox::warning(this, "Mượn sách", "Đã có lỗi xảy ra!");
-        }
+    } else {
+        on_dangNhapButton_clicked();
     }
 }
 
@@ -378,4 +390,14 @@ void MainWindow::on_huySachButton_clicked()
     ui->thayDoiSachButton->show();
     ui->chapNhanSachButton->hide();
     ui->huySachButton->hide();
+}
+
+void MainWindow::on_themSachButton_clicked()
+{
+    AddBook *addBook = new AddBook(0, db);
+    // Tự động giải phóng bộ nhớ sau khi tắt
+    addBook->setAttribute(Qt::WA_DeleteOnClose);
+    addBook->show();
+    // Cập nhật lại model nếu có sách mới thêm vào
+    QObject::connect(addBook, SIGNAL(accepted()), model, SLOT(select()));
 }

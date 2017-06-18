@@ -219,62 +219,7 @@ color: white;
             <property name="frameShadow">
              <enum>QFrame::Sunken</enum>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_8">
-               <item>
-                <widget class="QPushButton" name="muonButton">
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mượn các sách đã chọn&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true"/>
-                 </property>
-                 <property name="text">
-                  <string>Mượn</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="Line" name="line_3">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="thayDoiSachButton">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="text">
-                  <string>Thay đổi</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="chapNhanSachButton">
-                 <property name="text">
-                  <string>Chấp nhận</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="huySachButton">
-                 <property name="text">
-                  <string>Hủy</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="themSachButton">
-                 <property name="text">
-                  <string>Thêm sách</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
+            <layout class="QHBoxLayout" name="horizontalLayout_12">
              <item>
               <widget class="QFrame" name="biaSachFrame">
                <property name="minimumSize">
@@ -563,6 +508,54 @@ font: 12pt &quot;Tahoma&quot;;</string>
            </widget>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <widget class="QPushButton" name="muonButton">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mượn các sách đã chọn&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string>Mượn</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="themSachButton">
+              <property name="text">
+               <string>Thêm sách</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="thayDoiSachButton">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Thay đổi</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="chapNhanSachButton">
+              <property name="text">
+               <string>Chấp nhận</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="huySachButton">
+              <property name="text">
+               <string>Hủy</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -698,7 +691,7 @@ color: black;</string>
               <item>
                <widget class="QTabWidget" name="tabWidget">
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="muonSach">
                  <attribute name="title">

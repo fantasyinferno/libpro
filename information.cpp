@@ -291,6 +291,8 @@ void Information::on_currentIndexChanged(int i) {
     emit avatarChanged(ui->avatar->pixmap());
 }
 void Information::on_dangXuat() {
+    // Để tab mặc định là 0
+    ui->tabWidget->setCurrentIndex(0);
     // Bỏ trống mô hình
     model->setFilter("0");
     bookModel->setFilter("0");
