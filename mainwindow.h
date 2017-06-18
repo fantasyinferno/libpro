@@ -24,6 +24,7 @@ public:
     void initializeDatabase(QSqlDatabase);
     void initializeTable();
     void initializeQuotes();
+    void enableLibrarianButtons(bool, bool, bool, bool);
     QSqlDatabase getDatabase();
     QString getUser();
     ~MainWindow();
@@ -60,6 +61,8 @@ private slots:
     void on_muonButton_clicked();
     void on_chapThuanButton_clicked();
     void on_tuChoiButton_clicked();
+    void on_buttonGroup_buttonToggled(int, bool);
+    void on_librarianPick(QItemSelection current, QItemSelection previous);
 };
 
 

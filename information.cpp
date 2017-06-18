@@ -56,9 +56,16 @@ Information::Information(QWidget *parent, QSqlDatabase database) :
     mapper->addMapping(ui->ip_ns, model->fieldIndex("birthdate"));
     connect(mapper, SIGNAL(currentIndexChanged(int)), this, SLOT(on_currentIndexChanged(int)));
 
-    // Model cho sách đã mượn
+    // Thiết lập model xử lý lược sử mượn sách
     bookModel = new QSqlRelationalTableModel(this);
     bookModel->setTable("account_book");
+    bookModel->setEditStrategy(QSqlTableModel::OnFieldChange);
+    bookModel->setRelation(bookModel->fieldIndex("book_id"), QSqlRelation("book", "book_id", "title"));
+    bookModel->setRelation(bookModel->fieldIndex("book_status_id"), QSqlRelation("book_status", "book_status_id", "book_status"));
+    bookModel->setHeaderData(2, Qt::Horizontal, "Tựa đề");
+    bookModel->setHeaderData(3, Qt::Horizontal,  "Ngày mượn");
+    bookModel->setHeaderData(4, Qt::Horizontal, "Ngày hết hạn");
+    bookModel->setHeaderData(5, Qt::Horizontal, "Trạng thái");
 }
 void Information::on_informationRequest() {
     this->show();
@@ -222,21 +229,28 @@ void Information::on_thayDoiButton_clicked()
     enableEdit();
 }
 void Information::on_dangNhapThanhCong(int id, QString username) {
+    // Lưu tên đăng nhập và id mỗi lần đăng nhập
     user = username;
     ui->username->setText(user);
     user_id = id;
+    // Model chỉ hiển thị thông tin của người đăng nhập
     model->setFilter(QString("account_id = '%1'").arg(user_id)); // SQL Injection Alert!
     model->select();
-
+    // Gọi mapper
     mapper->toFirst();
     // Gọi hàm kiểm tra vai trò
     checkVt();
-    bookModel->setFilter(QString("account_id = %1").arg(user_id)); // SQL Injection Alert!
-    bookModel->setRelation(bookModel->fieldIndex("book_id"), QSqlRelation("book", "book_id", "title"));
-    bookModel->setHeaderData(1, Qt::Horizontal, "Tựa đề");
-    bookModel->setHeaderData(2, Qt::Horizontal,  "Ngày mượn");
-    bookModel->setHeaderData(3, Qt::Horizontal, "Ngày hết hạn");
+    // Model chỉ hiển thị lược sử sách của người đăng nhập
+    on_tabWidget_currentChanged(ui->tabWidget->currentIndex());
+    qDebug() << ui->tabWidget->currentIndex();
     bookModel->select();
+    // Đưa model cho 3 bảng
+    ui->sachDangMuon->setModel(bookModel);
+    ui->sachDangMuon->setItemDelegate(new QSqlRelationalDelegate(this));
+    ui->sachDangMuon->setColumnHidden(0, true);
+    ui->sachChoDuyet->setModel(bookModel);
+    ui->sachChoDuyet->setItemDelegate(new QSqlRelationalDelegate(this));
+    ui->sachChoDuyet->setColumnHidden(0, true);
     ui->sachDaMuon->setModel(bookModel);
     ui->sachDaMuon->setItemDelegate(new QSqlRelationalDelegate(this));
     ui->sachDaMuon->setColumnHidden(0, true);
@@ -245,10 +259,6 @@ void Information::on_huyButton_clicked()
 {
     enableEdit(false);
     mapper->revert();
-//    QByteArray imageByteArray = model->data(model->index(0, model->fieldIndex("avatar"))).toByteArray();
-//    QPixmap pixmap;
-//    pixmap.loadFromData(imageByteArray);
-//    ui->avatar->setPixmap(pixmap);
 }
 void Information::on_updateMyBooks(const QModelIndexList& selectedList) {
     QSqlQuery query(0, db);
@@ -279,15 +289,38 @@ void Information::on_currentIndexChanged(int i) {
     emit avatarChanged(ui->avatar->pixmap());
 }
 void Information::on_dangXuat() {
+    // Bỏ trống mô hình
     model->setFilter("0");
     bookModel->setFilter("0");
-    model->select();
-    bookModel->select();
+    // Nhập lại mappers
     mapper->toFirst();
+    // Xóa danh sách vai trò
+    rolesList.clear();
+    // Ẩn cửa sổ nếu cần thiết
+    this->hide();
 }
 
-void Information::on_iAmYourParent(QWidget *widget)
+void Information::on_matSachButton_clicked()
 {
-    this->setParent(widget);
-    this->setWindowFlags(Qt::Dialog);
+     QModelIndexList list = ui->sachDangMuon->selectionModel()->selectedRows(bookModel->fieldIndex("book_status"));
+     if (!list.isEmpty()) {
+        if (QMessageBox::question(this, "Báo cáo mất sách", "Bạn làm mất các sách đã chọn?") == QMessageBox::Yes) {
+            for (QModelIndex index: list) {
+                bookModel->setData(index, 4);
+            }
+            QMessageBox::information(this, "Cập nhật thành công!", "Chúng tôi đã báo cáo hành vi làm mất sách của bạn. Vui lòng chờ xử lý từ thủ thư.");
+        }
+     }
+}
+
+void Information::on_tabWidget_currentChanged(int index)
+{
+    if (index == 0) {
+        bookModel->setFilter(QString("book_status = 'Đang mượn' AND account_id = %1").arg(user_id));
+    }
+    else if (index == 1) {
+        bookModel->setFilter(QString("book_status = 'Chờ duyệt' AND account_id = %1").arg(user_id));
+    } else {
+        bookModel->setFilter(QString("(book_status = 'Đã mượn' OR book_status = 'Bị mất') AND account_id = %1").arg(user_id));
+    }
 }

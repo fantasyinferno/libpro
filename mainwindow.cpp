@@ -97,6 +97,14 @@ void MainWindow::initializeQuotes() {
     QString author = quoteQuery.value(1).toString();
     ui->quotesLabel->setText("'" + quote + "'\n - " + author);
 }
+
+void MainWindow::enableLibrarianButtons(bool chapThuan, bool tuChoi, bool phat, bool xacNhan)
+{
+    ui->chapThuanButton->setEnabled(chapThuan);
+    ui->tuChoiButton->setEnabled(tuChoi);
+    ui->phatButton->setEnabled(phat);
+    ui->xacNhanSachDaTraButton->setEnabled(xacNhan);
+}
 void MainWindow::initializeGUILogic(QSqlDatabase database) {
     initializeDatabase(database);
     initializeTable();
@@ -109,7 +117,6 @@ void MainWindow::initializeGUILogic(QSqlDatabase database) {
     ui->toolBox->setItemEnabled(0, true);
     ui->toolBox->setItemEnabled(1, false);
     ui->toolBox->setItemEnabled(2, false);
-
 }
 
 void MainWindow::on_dangXuatButton_clicked()
@@ -118,13 +125,23 @@ void MainWindow::on_dangXuatButton_clicked()
     ui->username->setText("");
     ui->username->setEnabled(false);
     ui->dangXuatButton->hide();
-    ui->thayDoiSachButton->hide();
-    ui->themSachButton->hide();
     ui->dangKyButton->show();
     ui->dangNhapButton->show();
     ui->avatarIcon->clear();
     ui->toolBox->setItemEnabled(0, true);
-    ui->toolBox->setItemEnabled(1, false);
+    if (rolesList.contains(2)) {
+        // Làm ngược lại với on_rolesLoaded()
+        ui->toolBox->setItemEnabled(1, false);
+        ui->danhMucSach->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->danhMucSach->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui->thayDoiSachButton->hide();
+        ui->themSachButton->hide();
+        delete requestBookModel;
+        // Set các checkbox thành true (trạng thái ban đầu)
+        for(auto &b: ui->buttonGroup->buttons()) {
+            b->setChecked(true);
+        }
+    }
     ui->toolBox->setItemEnabled(2, false);
     emit dangXuat();
 }
@@ -172,14 +189,16 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         ui->thayDoiSachButton->show();
         ui->themSachButton->show();
         requestBookModel = new QSqlRelationalTableModel(this, db);
+        requestBookModel->setEditStrategy(QSqlTableModel::OnFieldChange);
         requestBookModel->setTable("account_book");
         bookIdIdx = requestBookModel->fieldIndex("book_id");
         accountIdIdx = requestBookModel->fieldIndex("account_id");
         bookStatusIdIdx = requestBookModel->fieldIndex("book_status_id");
+        qDebug() << bookIdIdx << accountIdIdx << bookStatusIdIdx;
         requestBookModel->setRelation(bookIdIdx, QSqlRelation("book", "book_id", "title"));
         requestBookModel->setRelation(accountIdIdx, QSqlRelation("account", "account_id", "account"));
         requestBookModel->setRelation(bookStatusIdIdx, QSqlRelation("book_status", "book_status_id", "book_status"));
-        requestBookModel->setHeaderData(bookIdIdx, Qt::Horizontal, tr("ISBN"));
+        requestBookModel->setHeaderData(bookIdIdx, Qt::Horizontal, tr("Tựa đề"));
         requestBookModel->setHeaderData(accountIdIdx, Qt::Horizontal, tr("Người mượn"));
         requestBookModel->setHeaderData(requestBookModel->fieldIndex("start_date"), Qt::Horizontal, tr("Ngày ký mượn"));
         requestBookModel->setHeaderData(requestBookModel->fieldIndex("due_date"), Qt::Horizontal, tr("Ngày cần trả"));
@@ -189,7 +208,16 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         ui->yeuCau->setModel(requestBookModel);
         ui->yeuCau->setEditTriggers(QAbstractItemView::NoEditTriggers);
         ui->yeuCau->setSelectionBehavior(QAbstractItemView::SelectRows);
-
+        ui->yeuCau->setColumnHidden(requestBookModel->fieldIndex("account_book_id"), true);
+        ui->buttonGroup->setExclusive(false);
+        ui->buttonGroup->setId(ui->muonSachCheckbox, 0);
+        ui->buttonGroup->setId(ui->sachDangMuonCheckbox, 1);
+        ui->buttonGroup->setId(ui->quaHanCheckbox, 2);
+        ui->buttonGroup->setId(ui->matSachCheckbox, 3);
+        for(auto &b: ui->buttonGroup->buttons()) {
+            b->setChecked(true);
+        }
+        QObject::connect(ui->yeuCau->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), SLOT(on_librarianPick(QItemSelection,QItemSelection)));
     }
 }
 
@@ -200,24 +228,40 @@ void MainWindow::on_muonButton_clicked()
     if (!list.isEmpty()) {
         QSqlQuery query(0, db);
         query.prepare("INSERT INTO account_book(account_id, book_id, book_status_id) VALUES(?, ?, ?)");
+        bool ok = false;
         for (QModelIndex index: list) {
             query.addBindValue(user_id);
             query.addBindValue(index.data().toString());
             query.addBindValue(1);
-            if (!query.exec()) {
+            if (!(ok = query.exec())) {
                 qDebug() << query.lastError();
             }
+        }
+        if (ok) {
+            QMessageBox::information(this, "Mượn sách", "Bạn đã gửi yêu cầu mượn sách!");
+        } else {
+            QMessageBox::warning(this, "Mượn sách", "Đã có lỗi xảy ra!");
         }
     }
 }
 
 void MainWindow::on_chapThuanButton_clicked()
 {
-    QModelIndexList list = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status_id"));
+    QModelIndexList list = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status"));
     if (!list.isEmpty()) {
-        for (QModelIndex i: list) {
-            requestBookModel->setData(i, 2);
+        ui->yeuCau->setModel(0);
+        QModelIndex index;
+        for (QModelIndex &i: list) {
+            qDebug() << requestBookModel->data(i);
+            qDebug() << requestBookModel->setData(i, 2);
+            qDebug() << requestBookModel->data(i);
+            index = i;
         }
+        qDebug() << requestBookModel->data(index);
+        qDebug() << requestBookModel->submitAll();
+        qDebug() << requestBookModel->lastError();
+        qDebug() << requestBookModel->data(index);
+        ui->yeuCau->setModel(requestBookModel);
         QMessageBox::information(this, "Thành công!", "Bạn đã cho phép độc giả mượn sách!");
         // Gửi tin nhắn đến thành viên
     }
@@ -225,12 +269,49 @@ void MainWindow::on_chapThuanButton_clicked()
 
 void MainWindow::on_tuChoiButton_clicked()
 {
-    QModelIndexList list = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status_id"));
+    QModelIndexList list = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status"));
     if (!list.isEmpty()) {
-        for (QModelIndex i: list) {
+        for (QModelIndex &i: list) {
             requestBookModel->removeRow(i.row());
         }
         QMessageBox::information(this, "Thành công!", "Bạn đã từ chối yêu cầu của độc giả!");
         // Gửi tin nhắn đến thành viên
+    }
+}
+
+void MainWindow::on_buttonGroup_buttonToggled(int id, bool checked)
+{
+    QString filter;
+    filter += ui->buttonGroup->button(0)->isChecked() ? "book_status = 'Chờ duyệt' OR" : "0 OR";
+    filter += ui->buttonGroup->button(1)->isChecked() ? " book_status = 'Đã mượn' OR" : " 0 OR";
+    filter += ui->buttonGroup->button(2)->isChecked() ? " julianday(due_date) - julianday(start_date) > 15 OR" : " 0 OR";
+    filter += ui->buttonGroup->button(3)->isChecked() ? " book_status = 'Bị mất'" : " 0";
+    requestBookModel->setFilter(filter);
+    requestBookModel->select();
+}
+
+void MainWindow::on_librarianPick(QItemSelection current, QItemSelection previous)
+{
+    QModelIndexList statusList = ui->yeuCau->selectionModel()->selectedRows(bookStatusIdIdx);
+    QModelIndexList startDateList = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("start_date"));
+    QModelIndexList dueDateList = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("due_date"));
+    if (!statusList.empty()) {
+        for (int i = 0; i != statusList.size(); ++i) {
+            if (statusList[i].data().toString() == "Chờ duyệt") {
+                enableLibrarianButtons(1, 1, 0, 0);
+            }
+            else if (statusList[i].data().toString() == "Đã mượn") {
+                enableLibrarianButtons(0, 0, 0, 1);
+            }
+            else if (statusList[i].data().toString() == "Bị mất") {
+                enableLibrarianButtons(0, 0, 1, 1);
+            }
+            else if (startDateList[i].data().toDate().daysTo(dueDateList[i].data().toDate()) > 15) {
+                enableLibrarianButtons(0, 0, 1, 1);
+            }
+            else {
+                enableLibrarianButtons(0, 0, 0, 0);
+            }
+        }
     }
 }

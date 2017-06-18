@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     accountdelegate.cpp \
     accountchooser.cpp \
     about.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    finedialog.cpp
 
 HEADERS  += introform.h \
     bookdelegate.h \
@@ -38,14 +39,16 @@ HEADERS  += introform.h \
     accountdelegate.h \
     accountchooser.h \
     about.h \
-    mainwindow.h
+    mainwindow.h \
+    finedialog.h
 
 FORMS    += \
     information.ui \
     introform.ui \
     accountchooser.ui \
     about.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    finedialog.ui
 
 RESOURCES += \
     resources.qrc

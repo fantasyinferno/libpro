@@ -36,7 +36,10 @@ private slots:
     void on_currentIndexChanged(int);
     void on_informationRequest();
     void on_dangXuat();
-    void on_iAmYourParent(QWidget*);
+    void on_matSachButton_clicked();
+
+    void on_tabWidget_currentChanged(int index);
+
 signals:
     void avatarChanged(const QPixmap* pixmap);
     void rolesLoaded(QList<int>&);
