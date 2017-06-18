@@ -186,7 +186,7 @@ color: white;
 }</string>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="sachPage">
          <property name="enabled">
@@ -236,6 +236,37 @@ color: white;
                 </widget>
                </item>
                <item>
+                <widget class="Line" name="line_3">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="thayDoiSachButton">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="text">
+                  <string>Thay đổi</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="chapNhanSachButton">
+                 <property name="text">
+                  <string>Chấp nhận</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="huySachButton">
+                 <property name="text">
+                  <string>Hủy</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QPushButton" name="themSachButton">
                  <property name="text">
                   <string>Thêm sách</string>
@@ -261,7 +292,7 @@ color: white;
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
-               <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0">
+               <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0">
                 <item>
                  <widget class="QLabel" name="biaSach">
                   <property name="sizePolicy">
@@ -287,16 +318,6 @@ color: white;
                   </property>
                   <property name="scaledContents">
                    <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="thayDoiSachButton">
-                  <property name="enabled">
-                   <bool>true</bool>
-                  </property>
-                  <property name="text">
-                   <string>Thay đổi</string>
                   </property>
                  </widget>
                 </item>
@@ -521,7 +542,7 @@ font-size: 13pt;</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_10">
                   <item>
-                   <widget class="QTextBrowser" name="noiDungSach">
+                   <widget class="QTextEdit" name="noiDungSach">
                     <property name="styleSheet">
                      <string notr="true">background-color: rgba(255, 255, 255, 0);
 border: none;

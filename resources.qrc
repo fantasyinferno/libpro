@@ -17,5 +17,6 @@
         <file>media/icons/projection.png</file>
         <file>media/icons/quill.png</file>
         <file>media/icons/student-hat.png</file>
+        <file>media/images/default_cover.png</file>
     </qresource>
 </RCC>

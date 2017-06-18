@@ -75,18 +75,18 @@ void MainWindow::initializeTable()
     ui->danhMucSach->setColumnWidth(2, 400);
     ui->danhMucSach->setColumnWidth(3, 400);
     ui->danhMucSach->setColumnHidden(6, true);
-    QDataWidgetMapper *mapper = new QDataWidgetMapper(this);
-    mapper->setModel(model);
-    mapper->setItemDelegate(new BookDelegate(this));
-    mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
-    mapper->addMapping(ui->maSach, model->fieldIndex("book_id"));
-    mapper->addMapping(ui->biaSach, model->fieldIndex("cover"));
-    mapper->addMapping(ui->noiDungSach, model->fieldIndex("description"));
-    mapper->addMapping(ui->tuaDe, model->fieldIndex("title"));
-    mapper->addMapping(ui->tacGia, model->fieldIndex("author"));
-    mapper->addMapping(ui->namSanXuat, model->fieldIndex("year"));
-    mapper->addMapping(ui->biaSach, model->fieldIndex("cover"));
-    connect(ui->danhMucSach->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), mapper, SLOT(setCurrentModelIndex(QModelIndex)));
+    bookMapper = new QDataWidgetMapper(this);
+    bookMapper->setModel(model);
+    bookMapper->setItemDelegate(new BookDelegate(this));
+    bookMapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
+    bookMapper->addMapping(ui->maSach, model->fieldIndex("book_id"));
+    bookMapper->addMapping(ui->biaSach, model->fieldIndex("cover"));
+    bookMapper->addMapping(ui->noiDungSach, model->fieldIndex("description"));
+    bookMapper->addMapping(ui->tuaDe, model->fieldIndex("title"));
+    bookMapper->addMapping(ui->tacGia, model->fieldIndex("author"));
+    bookMapper->addMapping(ui->namSanXuat, model->fieldIndex("year"));
+    bookMapper->addMapping(ui->biaSach, model->fieldIndex("cover"));
+    connect(ui->danhMucSach->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), bookMapper, SLOT(setCurrentModelIndex(QModelIndex)));
     connect(ui->danhMucSach->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), ui->hienThiSach, SLOT(show()));
     ui->hienThiSach->hide();
 }
@@ -97,6 +97,15 @@ void MainWindow::initializeQuotes() {
     QString quote = quoteQuery.value(0).toString();
     QString author = quoteQuery.value(1).toString();
     ui->quotesLabel->setText("'" + quote + "'\n - " + author);
+}
+
+void MainWindow::initializeButtons()
+{
+    ui->dangXuatButton->hide();
+    ui->thayDoiSachButton->hide();
+    ui->themSachButton->hide();
+    ui->chapNhanSachButton->hide();
+    ui->huySachButton->hide();
 }
 
 void MainWindow::enableLibrarianButtons(bool chapThuan, bool tuChoi, bool phat, bool xacNhan)
@@ -110,10 +119,9 @@ void MainWindow::initializeGUILogic(QSqlDatabase database) {
     initializeDatabase(database);
     initializeTable();
     initializeQuotes();
+    initializeButtons();
     connect(ui->timKiemButton, SIGNAL(clicked()), this, SLOT(on_thanhTimKiem_returnPressed()));
-    ui->dangXuatButton->hide();
-    ui->thayDoiSachButton->hide();
-    ui->themSachButton->hide();
+
     ui->username->setEnabled(false);
     ui->toolBox->setItemEnabled(0, true);
     ui->toolBox->setItemEnabled(1, false);
@@ -184,10 +192,11 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         ui->toolBox->setItemEnabled(p - 1, true);
     }
     if (rolesList.contains(2)) {
-        ui->danhMucSach->setEditTriggers(QAbstractItemView::DoubleClicked);
-        ui->danhMucSach->setSelectionBehavior(QAbstractItemView::SelectItems);
+        // Có thể sửa sách
         ui->thayDoiSachButton->show();
         ui->themSachButton->show();
+
+        // Có thể chấp thuận yêu cầu sách
         requestBookModel = new QSqlRelationalTableModel(this, db);
         requestBookModel->setEditStrategy(QSqlTableModel::OnFieldChange);
         requestBookModel->setTable("account_book");
@@ -328,4 +337,45 @@ void MainWindow::on_xacNhanSachDaTraButton_clicked()
         QMessageBox::information(this, "Thành công!", "Bạn đã xác nhận sách đã trả!");
         // Gửi tin nhắn đến thành viên
     }
+}
+
+void MainWindow::on_thayDoiSachButton_clicked()
+{
+    ui->maSach->setReadOnly(false);
+    ui->namSanXuat->setReadOnly(false);
+    ui->tacGia->setReadOnly(false);
+    ui->theLoai->setReadOnly(false);
+    ui->tuaDe->setReadOnly(false);
+    ui->noiDungSach->setReadOnly(false);
+    ui->thayDoiSachButton->hide();
+    ui->chapNhanSachButton->show();
+    ui->huySachButton->show();
+}
+
+void MainWindow::on_chapNhanSachButton_clicked()
+{
+    bookMapper->submit();
+    ui->maSach->setReadOnly(true);
+    ui->namSanXuat->setReadOnly(true);
+    ui->tacGia->setReadOnly(true);
+    ui->theLoai->setReadOnly(true);
+    ui->tuaDe->setReadOnly(true);
+    ui->noiDungSach->setReadOnly(true);
+    ui->thayDoiSachButton->show();
+    ui->chapNhanSachButton->hide();
+    ui->huySachButton->hide();
+}
+
+void MainWindow::on_huySachButton_clicked()
+{
+    bookMapper->revert();
+    ui->maSach->setReadOnly(true);
+    ui->namSanXuat->setReadOnly(true);
+    ui->tacGia->setReadOnly(true);
+    ui->theLoai->setReadOnly(true);
+    ui->tuaDe->setReadOnly(true);
+    ui->noiDungSach->setReadOnly(true);
+    ui->thayDoiSachButton->show();
+    ui->chapNhanSachButton->hide();
+    ui->huySachButton->hide();
 }

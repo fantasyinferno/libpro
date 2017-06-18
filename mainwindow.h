@@ -20,11 +20,6 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0, QSqlDatabase database = QSqlDatabase());
-    void initializeGUILogic(QSqlDatabase);
-    void initializeDatabase(QSqlDatabase);
-    void initializeTable();
-    void initializeQuotes();
-    void enableLibrarianButtons(bool, bool, bool, bool);
     QSqlDatabase getDatabase();
     QString getUser();
     ~MainWindow();
@@ -35,6 +30,8 @@ private:
     QSqlTableModel *model;
     QSqlRelationalTableModel *requestBookModel;
     int bookIdIdx, accountIdIdx, bookStatusIdIdx;
+    // Mapper
+    QDataWidgetMapper *bookMapper;
     // Cơ sở dữ liệu.
     QSqlDatabase db;
     // Tên truy cập và id
@@ -65,6 +62,15 @@ private slots:
     void on_tabWidget_currentChanged(int index);
     void on_hanNop_currentIndexChanged(int index);
     void on_xacNhanSachDaTraButton_clicked();
+    void on_thayDoiSachButton_clicked();
+    void on_chapNhanSachButton_clicked();
+    void on_huySachButton_clicked();
+    void initializeGUILogic(QSqlDatabase);
+    void initializeDatabase(QSqlDatabase);
+    void initializeTable();
+    void initializeQuotes();
+    void initializeButtons();
+    void enableLibrarianButtons(bool, bool, bool, bool);
 };
 
 
