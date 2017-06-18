@@ -69,6 +69,7 @@ Information::Information(QWidget *parent, QSqlDatabase database) :
 }
 void Information::on_informationRequest() {
     this->show();
+    on_tabWidget_currentChanged(ui->tabWidget->currentIndex());
 }
 
 void Information::load(QString tendangnhap, QString vaitro)
@@ -241,19 +242,20 @@ void Information::on_dangNhapThanhCong(int id, QString username) {
     // Gọi hàm kiểm tra vai trò
     checkVt();
     // Model chỉ hiển thị lược sử sách của người đăng nhập
-    on_tabWidget_currentChanged(ui->tabWidget->currentIndex());
-    qDebug() << ui->tabWidget->currentIndex();
     bookModel->select();
     // Đưa model cho 3 bảng
     ui->sachDangMuon->setModel(bookModel);
     ui->sachDangMuon->setItemDelegate(new QSqlRelationalDelegate(this));
-    ui->sachDangMuon->setColumnHidden(0, true);
+    ui->sachDangMuon->setColumnHidden(bookModel->fieldIndex("account_id"), true);
+    ui->sachDangMuon->setColumnHidden(bookModel->fieldIndex("account_book_id"), true);
     ui->sachChoDuyet->setModel(bookModel);
     ui->sachChoDuyet->setItemDelegate(new QSqlRelationalDelegate(this));
-    ui->sachChoDuyet->setColumnHidden(0, true);
+    ui->sachChoDuyet->setColumnHidden(bookModel->fieldIndex("account_id"), true);
+    ui->sachChoDuyet->setColumnHidden(bookModel->fieldIndex("account_book_id"), true);
     ui->sachDaMuon->setModel(bookModel);
     ui->sachDaMuon->setItemDelegate(new QSqlRelationalDelegate(this));
-    ui->sachDaMuon->setColumnHidden(0, true);
+    ui->sachDaMuon->setColumnHidden(bookModel->fieldIndex("account_id"), true);
+    ui->sachDaMuon->setColumnHidden(bookModel->fieldIndex("account_book_id"), true);
 }
 void Information::on_huyButton_clicked()
 {
@@ -321,6 +323,6 @@ void Information::on_tabWidget_currentChanged(int index)
     else if (index == 1) {
         bookModel->setFilter(QString("book_status = 'Chờ duyệt' AND account_id = %1").arg(user_id));
     } else {
-        bookModel->setFilter(QString("(book_status = 'Đã mượn' OR book_status = 'Bị mất') AND account_id = %1").arg(user_id));
+        bookModel->setFilter(QString("(book_status = 'Đã trả' OR book_status = 'Bị mất') AND account_id = %1").arg(user_id));
     }
 }

@@ -14,6 +14,7 @@
 #include <QByteArray>
 #include <QSqlRelation>
 #include <QSqlRelationalTableModel>
+#include "finedialog.h"
 
 MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
     QMainWindow(parent),
@@ -136,11 +137,10 @@ void MainWindow::on_dangXuatButton_clicked()
         ui->danhMucSach->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->thayDoiSachButton->hide();
         ui->themSachButton->hide();
+        ui->muonSachTable->setModel(0);
+        ui->dangMuonTable->setModel(0);
+        ui->matSachTable->setModel(0);
         delete requestBookModel;
-        // Set các checkbox thành true (trạng thái ban đầu)
-        for(auto &b: ui->buttonGroup->buttons()) {
-            b->setChecked(true);
-        }
     }
     ui->toolBox->setItemEnabled(2, false);
     emit dangXuat();
@@ -194,7 +194,6 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         bookIdIdx = requestBookModel->fieldIndex("book_id");
         accountIdIdx = requestBookModel->fieldIndex("account_id");
         bookStatusIdIdx = requestBookModel->fieldIndex("book_status_id");
-        qDebug() << bookIdIdx << accountIdIdx << bookStatusIdIdx;
         requestBookModel->setRelation(bookIdIdx, QSqlRelation("book", "book_id", "title"));
         requestBookModel->setRelation(accountIdIdx, QSqlRelation("account", "account_id", "account"));
         requestBookModel->setRelation(bookStatusIdIdx, QSqlRelation("book_status", "book_status_id", "book_status"));
@@ -203,27 +202,25 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         requestBookModel->setHeaderData(requestBookModel->fieldIndex("start_date"), Qt::Horizontal, tr("Ngày ký mượn"));
         requestBookModel->setHeaderData(requestBookModel->fieldIndex("due_date"), Qt::Horizontal, tr("Ngày cần trả"));
         requestBookModel->setHeaderData(bookStatusIdIdx, Qt::Horizontal, tr("Trạng thái"));
-
         requestBookModel->select();
-        ui->yeuCau->setModel(requestBookModel);
-        ui->yeuCau->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        ui->yeuCau->setSelectionBehavior(QAbstractItemView::SelectRows);
-        ui->yeuCau->setColumnHidden(requestBookModel->fieldIndex("account_book_id"), true);
-        ui->buttonGroup->setExclusive(false);
-        ui->buttonGroup->setId(ui->muonSachCheckbox, 0);
-        ui->buttonGroup->setId(ui->sachDangMuonCheckbox, 1);
-        ui->buttonGroup->setId(ui->quaHanCheckbox, 2);
-        ui->buttonGroup->setId(ui->matSachCheckbox, 3);
-        for(auto &b: ui->buttonGroup->buttons()) {
-            b->setChecked(true);
-        }
-        QObject::connect(ui->yeuCau->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), SLOT(on_librarianPick(QItemSelection,QItemSelection)));
+        ui->muonSachTable->setModel(requestBookModel);
+        ui->muonSachTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->muonSachTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui->muonSachTable->setColumnHidden(requestBookModel->fieldIndex("account_book_id"), true);
+        ui->dangMuonTable->setModel(requestBookModel);
+        ui->dangMuonTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->dangMuonTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui->dangMuonTable->setColumnHidden(requestBookModel->fieldIndex("account_book_id"), true);
+        ui->matSachTable->setModel(requestBookModel);
+        ui->matSachTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->matSachTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui->matSachTable->setColumnHidden(requestBookModel->fieldIndex("account_book_id"), true);
+        on_tabWidget_currentChanged(ui->tabWidget->currentIndex());
     }
 }
 
 void MainWindow::on_muonButton_clicked()
 {
-
     QModelIndexList list = ui->danhMucSach->selectionModel()->selectedRows(0);
     if (!list.isEmpty()) {
         QSqlQuery query(0, db);
@@ -247,21 +244,15 @@ void MainWindow::on_muonButton_clicked()
 
 void MainWindow::on_chapThuanButton_clicked()
 {
-    QModelIndexList list = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status"));
+    QModelIndexList list = ui->muonSachTable->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status"));
     if (!list.isEmpty()) {
-        ui->yeuCau->setModel(0);
-        QModelIndex index;
         for (QModelIndex &i: list) {
-            qDebug() << requestBookModel->data(i);
-            qDebug() << requestBookModel->setData(i, 2);
-            qDebug() << requestBookModel->data(i);
-            index = i;
+            requestBookModel->setData(i, 2);
+            QDate today = QDate::currentDate();
+            requestBookModel->setData(i.sibling(i.row(), requestBookModel->fieldIndex("start_date")), today);
+            requestBookModel->setData(i.sibling(i.row(), requestBookModel->fieldIndex("due_date")), today.addDays(15));
         }
-        qDebug() << requestBookModel->data(index);
-        qDebug() << requestBookModel->submitAll();
-        qDebug() << requestBookModel->lastError();
-        qDebug() << requestBookModel->data(index);
-        ui->yeuCau->setModel(requestBookModel);
+        requestBookModel->select();
         QMessageBox::information(this, "Thành công!", "Bạn đã cho phép độc giả mượn sách!");
         // Gửi tin nhắn đến thành viên
     }
@@ -269,49 +260,72 @@ void MainWindow::on_chapThuanButton_clicked()
 
 void MainWindow::on_tuChoiButton_clicked()
 {
-    QModelIndexList list = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status"));
+    QModelIndexList list = ui->muonSachTable->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status"));
     if (!list.isEmpty()) {
         for (QModelIndex &i: list) {
             requestBookModel->removeRow(i.row());
         }
+        requestBookModel->select();
         QMessageBox::information(this, "Thành công!", "Bạn đã từ chối yêu cầu của độc giả!");
         // Gửi tin nhắn đến thành viên
     }
 }
 
-void MainWindow::on_buttonGroup_buttonToggled(int id, bool checked)
+void MainWindow::on_phatButton_clicked()
 {
-    QString filter;
-    filter += ui->buttonGroup->button(0)->isChecked() ? "book_status = 'Chờ duyệt' OR" : "0 OR";
-    filter += ui->buttonGroup->button(1)->isChecked() ? " book_status = 'Đã mượn' OR" : " 0 OR";
-    filter += ui->buttonGroup->button(2)->isChecked() ? " julianday(due_date) - julianday(start_date) > 15 OR" : " 0 OR";
-    filter += ui->buttonGroup->button(3)->isChecked() ? " book_status = 'Bị mất'" : " 0";
-    requestBookModel->setFilter(filter);
-    requestBookModel->select();
+    QModelIndexList list;
+    if (ui->tabWidget->currentIndex() == 1) {
+        list = ui->dangMuonTable->selectionModel()->selectedRows(bookStatusIdIdx);
+    } else {
+        list = ui->matSachTable->selectionModel()->selectedRows(bookStatusIdIdx);
+    }
+    if (!list.isEmpty()) {
+        FineDialog *fineDialog = new FineDialog(this, db, list);
+        fineDialog->setWindowTitle("Phạt");
+        // Thuộc tính này giúp fineDialog tự giải phóng bộ nhớ sau khi tắt dialog
+        fineDialog->setAttribute(Qt::WA_DeleteOnClose);
+        fineDialog->show();
+    }
 }
 
-void MainWindow::on_librarianPick(QItemSelection current, QItemSelection previous)
+void MainWindow::on_tabWidget_currentChanged(int index)
 {
-    QModelIndexList statusList = ui->yeuCau->selectionModel()->selectedRows(bookStatusIdIdx);
-    QModelIndexList startDateList = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("start_date"));
-    QModelIndexList dueDateList = ui->yeuCau->selectionModel()->selectedRows(requestBookModel->fieldIndex("due_date"));
-    if (!statusList.empty()) {
-        for (int i = 0; i != statusList.size(); ++i) {
-            if (statusList[i].data().toString() == "Chờ duyệt") {
-                enableLibrarianButtons(1, 1, 0, 0);
-            }
-            else if (statusList[i].data().toString() == "Đã mượn") {
-                enableLibrarianButtons(0, 0, 0, 1);
-            }
-            else if (statusList[i].data().toString() == "Bị mất") {
-                enableLibrarianButtons(0, 0, 1, 1);
-            }
-            else if (startDateList[i].data().toDate().daysTo(dueDateList[i].data().toDate()) > 15) {
-                enableLibrarianButtons(0, 0, 1, 1);
-            }
-            else {
-                enableLibrarianButtons(0, 0, 0, 0);
-            }
+    if (index == 0) {
+        // Chờ duyệt
+        requestBookModel->setFilter("book_status = 'Chờ duyệt'");
+        enableLibrarianButtons(1, 1, 0, 0);
+    } else if (index == 1) {
+        // Sách đang mượn
+        on_hanNop_currentIndexChanged(ui->hanNop->currentIndex());
+    } else if (index == 2) {
+        // Sách quá hạn
+        requestBookModel->setFilter("book_status = 'Bị mất'");
+        enableLibrarianButtons(0, 0, 1, 0);
+    }
+}
+
+void MainWindow::on_hanNop_currentIndexChanged(int index)
+{
+    if (index == 0) {
+        // Sách trong kỳ hạn
+        requestBookModel->setFilter("book_status = 'Đang mượn' AND julianday(due_date) - julianday(start_date) <= 15");
+        enableLibrarianButtons(0, 0, 0, 1);
+    } else {
+        // Sách quá hạn
+        requestBookModel->setFilter("book_status = 'Đang mượn' AND julianday(due_date) - julianday(start_date) > 15");
+        enableLibrarianButtons(0, 0, 1, 1);
+    }
+}
+
+void MainWindow::on_xacNhanSachDaTraButton_clicked()
+{
+    QModelIndexList list = ui->dangMuonTable->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status"));
+    if (!list.isEmpty()) {
+        for (QModelIndex &i: list) {
+            requestBookModel->setData(i, 3);
         }
+        requestBookModel->select();
+        QMessageBox::information(this, "Thành công!", "Bạn đã xác nhận sách đã trả!");
+        // Gửi tin nhắn đến thành viên
     }
 }

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>FineDialog</class>
  <widget class="QDialog" name="FineDialog">
@@ -12,6 +13,84 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QComboBox" name="hinhThuc">
+           <item>
+            <property name="text">
+             <string>Nhắc nhở</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Cảnh cáo</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Phạt hành chính</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="soTien">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPlainTextEdit" name="noiDung">
+         <property name="placeholderText">
+          <string>Để lại tin nhắn cho đối tượng</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="chapNhan">
+         <property name="text">
+          <string>Chấp nhận</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="huyBo">
+         <property name="text">
+          <string>Hủy bỏ</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

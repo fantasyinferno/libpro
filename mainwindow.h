@@ -61,8 +61,10 @@ private slots:
     void on_muonButton_clicked();
     void on_chapThuanButton_clicked();
     void on_tuChoiButton_clicked();
-    void on_buttonGroup_buttonToggled(int, bool);
-    void on_librarianPick(QItemSelection current, QItemSelection previous);
+    void on_phatButton_clicked();
+    void on_tabWidget_currentChanged(int index);
+    void on_hanNop_currentIndexChanged(int index);
+    void on_xacNhanSachDaTraButton_clicked();
 };
 
 

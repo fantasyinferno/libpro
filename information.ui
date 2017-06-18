@@ -416,7 +416,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
@@ -464,7 +464,7 @@
          </widget>
          <widget class="QWidget" name="tab_3">
           <attribute name="title">
-           <string>Sách đã mượn</string>
+           <string>Sách đã trả</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
