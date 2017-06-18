@@ -28,7 +28,6 @@ SOURCES += main.cpp\
     information.cpp \
     introform.cpp \
     accountdelegate.cpp \
-    accountchooser.cpp \
     about.cpp \
     mainwindow.cpp \
     finedialog.cpp \
@@ -38,7 +37,6 @@ HEADERS  += introform.h \
     bookdelegate.h \
     information.h \
     accountdelegate.h \
-    accountchooser.h \
     about.h \
     mainwindow.h \
     finedialog.h \
@@ -47,7 +45,6 @@ HEADERS  += introform.h \
 FORMS    += \
     information.ui \
     introform.ui \
-    accountchooser.ui \
     about.ui \
     mainwindow.ui \
     finedialog.ui \

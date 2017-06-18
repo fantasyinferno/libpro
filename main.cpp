@@ -3,7 +3,6 @@
 #include <QDir>
 #include "information.h"
 #include "introform.h"
-#include "accountchooser.h"
 #include "mainwindow.h"
 #include "about.h"
 int main(int argc, char *argv[])
