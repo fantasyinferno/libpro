@@ -23,7 +23,7 @@ ManagerGUI::ManagerGUI(QWidget *parent) :
 {
     ui->setupUi(this);
     db=QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("C:/Users/pc/Documents/QT/Ass2/Git/libpro/libpro.db");
+    db.setDatabaseName("F:/SoftwareDevelopment/Qt/libpro/libpro.db");
     db.open();
 
     initializeTable();
