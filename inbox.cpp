@@ -13,6 +13,7 @@ Inbox::Inbox(QWidget *parent, QSqlDatabase database) :
     ui(new Ui::Inbox)
 {
     ui->setupUi(this);
+    this->setModal(true);
     db = database;
     model = new QSqlRelationalTableModel(this, db);
     model->setTable("message");

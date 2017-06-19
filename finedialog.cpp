@@ -8,6 +8,7 @@ FineDialog::FineDialog(QWidget *parent, QSqlDatabase database, QModelIndexList l
     ui(new Ui::FineDialog)
 {
     ui->setupUi(this);
+    this->setModal(true);
     db = database;
     // Lấy thông tin các hàng được chọn
     selected = list;

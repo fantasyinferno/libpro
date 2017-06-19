@@ -376,6 +376,8 @@ void MainWindow::on_phatButton_clicked()
     if (!list.isEmpty()) {
         FineDialog *fineDialog = new FineDialog(this, db, list, inbox);
         fineDialog->setWindowTitle("Phạt");
+        fineDialog->raise();
+        fineDialog->setModal(true);
         // Thuộc tính này giúp fineDialog tự giải phóng bộ nhớ sau khi tắt dialog
         fineDialog->setAttribute(Qt::WA_DeleteOnClose);
         fineDialog->show();
@@ -468,9 +470,15 @@ void MainWindow::on_huySachButton_clicked()
 void MainWindow::on_themSachButton_clicked()
 {
     AddBook *addBook = new AddBook(0, db);
+    qDebug() << addBook->isModal();
+    addBook->setModal(true);
+    qDebug() << addBook->isModal();
+    addBook->setWindowTitle("Thêm sách");
     // Tự động giải phóng bộ nhớ sau khi tắt
     addBook->setAttribute(Qt::WA_DeleteOnClose);
     addBook->show();
+    qDebug() << addBook->isModal();
+    addBook->raise();
     // Cập nhật lại model nếu có sách mới thêm vào
     QObject::connect(addBook, SIGNAL(accepted()), model, SLOT(select()));
 }
