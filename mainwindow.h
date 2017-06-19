@@ -30,10 +30,10 @@ private:
     Ui::MainWindow *ui;
     // Model thể hiện thông tin lấy từ cơ sở dữ liệu
     QSqlTableModel *model;
-    QSqlRelationalTableModel *requestBookModel;
+    QSqlRelationalTableModel *requestBookModel, *memberModel;
     int bookIdIdx, accountIdIdx, bookStatusIdIdx;
     // Mapper
-    QDataWidgetMapper *bookMapper;
+    QDataWidgetMapper *bookMapper, *memberMapper;
     // Cơ sở dữ liệu.
     QSqlDatabase db;
     // Tên truy cập và id
@@ -41,12 +41,12 @@ private:
     int user_id;
     // Vai trò
     QList<int> rolesList;
-
     // UI
     IntroForm *introForm;
     Information *information;
     About *about;
     Inbox *inbox;
+
 
 signals:
     void updateMyBooks(const QModelIndexList&);
@@ -83,6 +83,14 @@ private slots:
     void enableLibrarianButtons(bool, bool, bool, bool);
     void on_themSachButton_clicked();
     void on_hopThuButton_clicked();
+
+    // Kiểm tra vai trò (manager)
+    void submitVt();
+    void checkVt();
+    void on_thayDoiButton_clicked();
+    void on_xoaButton_clicked();
+    void on_thanhTimKiem_2_returnPressed();
+    void on_timKiemButton_2_clicked();
 };
 
 

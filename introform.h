@@ -20,6 +20,7 @@ public:
     ~IntroForm();
 
     void setTab(int);
+    void setType(bool);
 
 private slots:
     void on_pushButton_clicked();

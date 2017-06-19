@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>libpro.db</file>
         <file>media/images/logo.png</file>
         <file>media/icons/search_bar.png</file>
         <file>media/images/default.png</file>

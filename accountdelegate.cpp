@@ -3,11 +3,30 @@
 #include <QByteArray>
 #include <QPixmap>
 #include <QBuffer>
-
+#include <QPainter>
 AccountDelegate::AccountDelegate(QWidget* parent): QSqlRelationalDelegate(parent)
 {
 
 }
+
+void AccountDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    if (index.column() == 10) {
+        // 10 là cột avatar
+        QByteArray imageByteArray = index.data().toByteArray();
+        QPixmap image;
+        image.loadFromData(imageByteArray);
+        int x = option.rect.x();
+        int y = option.rect.y();
+        int w = 30;
+        int h = option.rect.height();
+        drawBackground(painter, option, index);
+        drawFocus(painter, option, option.rect);
+        painter->drawPixmap(x + option.rect.width() / 2 - w / 2, y, w, h, image);
+    } else {
+        QSqlRelationalDelegate::paint(painter, option, index);
+    }
+}
+
 void AccountDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
     if (index.column() != 10) {
         QSqlRelationalDelegate::setEditorData(editor, index);

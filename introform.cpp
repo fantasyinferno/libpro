@@ -61,10 +61,6 @@ void IntroForm::setTab(int i)
 
 void IntroForm::on_dangKyButton_clicked()
 {
-
-
-
-
 //    query("select max(user_id) as user_id from user;");
 
     if (ui->dk_tdn->text()=="")
@@ -122,12 +118,12 @@ void IntroForm::on_dangKyButton_clicked()
     if (ui->dk_vt_librarian->isChecked()) {
         query.addBindValue(id);
         query.addBindValue(2);
-        ok &= query.exec();
+//        ok &= query.exec();
     }
     if (ui->dk_vt_manager->isChecked()) {
         query.addBindValue(id);
         query.addBindValue(3);
-        ok &= query.exec();
+//        ok &= query.exec();
     }
     if(ok){
         QMessageBox::about(this,"Đăng ký thành công","Đăng ký tài khoản thành công");
@@ -149,6 +145,7 @@ void IntroForm::on_avatarButton_clicked()
         ui->avatar->setPixmap(pixmap);
     }
 }
+
 
 void IntroForm::on_formRequest(int tab) {
     this->setTab(tab);
