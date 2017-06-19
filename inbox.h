@@ -15,6 +15,8 @@ class Inbox : public QDialog
 
 public:
     explicit Inbox(QWidget *parent = 0, QSqlDatabase database = QSqlDatabase());
+    // Hàm gửi tin nhắn đến thành viên
+    bool sendMessage(QString, QString, QString);
     ~Inbox();
 
 private slots:
@@ -23,7 +25,6 @@ private slots:
     void on_dangXuat();
     void on_guiButton_clicked();
     void on_messageRead(QModelIndex);
-
     void on_capNhatButton_clicked();
 
 private:

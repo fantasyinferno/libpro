@@ -17,10 +17,10 @@ Inbox::Inbox(QWidget *parent, QSqlDatabase database) :
     model = new QSqlRelationalTableModel(this, db);
     model->setTable("message");
     model->setHeaderData(model->fieldIndex("receiver"), Qt::Horizontal, tr("Người nhận"));
-    model->setHeaderData(model->fieldIndex("sender"), Qt::Horizontal, tr("Thời điểm gửi"));
+    model->setHeaderData(model->fieldIndex("sender"), Qt::Horizontal, tr("Người gửi"));
     model->setHeaderData(model->fieldIndex("title"), Qt::Horizontal, tr("Tiêu đề"));
     model->setHeaderData(model->fieldIndex("content"), Qt::Horizontal, tr("Nội dung"));
-    model->setHeaderData(model->fieldIndex("send_at"), Qt::Horizontal, tr("Ngày gửi"));
+    model->setHeaderData(model->fieldIndex("send_at"), Qt::Horizontal, tr("Thời gian"));
     messageModel = new MessageModel(this);
     messageModel->setSourceModel(model);
 
@@ -28,10 +28,14 @@ Inbox::Inbox(QWidget *parent, QSqlDatabase database) :
     ui->hopThuDenTable->setModel(messageModel);
     ui->hopThuDenTable->setItemDelegate(new QSqlRelationalDelegate(this));
     ui->hopThuDenTable->setColumnHidden(model->fieldIndex("message_id"), true);
+    ui->hopThuDenTable->setColumnHidden(model->fieldIndex("receiver"), true);
     ui->hopThuDenTable->setColumnHidden(model->fieldIndex("is_read"), true);
     ui->hopThuDenTable->sortByColumn(model->fieldIndex("send_at"), Qt::DescendingOrder);
     ui->hopThuDiTable->setModel(model);
     ui->hopThuDiTable->setItemDelegate(new QSqlRelationalDelegate(this));
+    ui->hopThuDiTable->setColumnHidden(model->fieldIndex("message_id"), true);
+    ui->hopThuDiTable->setColumnHidden(model->fieldIndex("sender"), true);
+    ui->hopThuDiTable->setColumnHidden(model->fieldIndex("is_read"), true);
     ui->hopThuDiTable->setColumnHidden(0, true);
     ui->hopThuDenTable->sortByColumn(model->fieldIndex("send_at"), Qt::DescendingOrder);
 
@@ -41,20 +45,51 @@ Inbox::Inbox(QWidget *parent, QSqlDatabase database) :
     model->setRelation(senderIdx, QSqlRelation("account", "account_id", "account"));
     model->select();
     int contentIdx = model->fieldIndex("content");
+    int titleIdx = model->fieldIndex("title");
     QDataWidgetMapper *hopThuDenMapper = new QDataWidgetMapper(this);
     hopThuDenMapper->setItemDelegate(new QSqlRelationalDelegate(this));
     hopThuDenMapper->setModel(messageModel);
     hopThuDenMapper->addMapping(ui->loiNhanTextEdit, contentIdx);
+    hopThuDenMapper->addMapping(ui->tieuDeLineEdit, titleIdx);
+    hopThuDenMapper->addMapping(ui->nguoiGuiLineEdit, senderIdx);
     connect(ui->hopThuDenTable->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), hopThuDenMapper, SLOT(setCurrentModelIndex(QModelIndex)));
     QDataWidgetMapper *hopThuDiMapper = new QDataWidgetMapper(this);
     hopThuDiMapper->setItemDelegate(new QSqlRelationalDelegate(this));
     hopThuDiMapper->setModel(model);
     hopThuDiMapper->addMapping(ui->loiNhanTextEdit, contentIdx);
+    hopThuDiMapper->addMapping(ui->tieuDeLineEdit, titleIdx);
+    hopThuDiMapper->addMapping(ui->nguoiGuiLineEdit, receiverIdx);
     connect(ui->hopThuDiTable->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), hopThuDiMapper, SLOT(setCurrentModelIndex(QModelIndex)));
-
     connect(ui->hopThuDenTable->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(on_messageRead(QModelIndex)));
     ui->nguoiNhan->setModel(model->relationModel(receiverIdx));
     ui->nguoiNhan->setModelColumn(1);
+}
+
+bool Inbox::sendMessage(QString username, QString title, QString text)
+{
+    QSqlQuery query(0, db);
+    query.prepare("SELECT account_id FROM account WHERE account = ?");
+    query.addBindValue(username);
+    if (!query.exec()) {
+        qDebug() << query.lastError();
+        return false;
+    }
+    if (!query.next()) {
+        qDebug() << query.lastError();
+        return false;
+    }
+    int receiver_id = query.value(0).toInt();
+    // Gửi tin nhắn
+    query.prepare("INSERT INTO message(sender, receiver, title, content) VALUES(?, ?, ?, ?)");
+    query.addBindValue(user_id);
+    query.addBindValue(receiver_id);
+    query.addBindValue(title);
+    query.addBindValue(text);
+    if (!query.exec()) {
+        qDebug() << query.lastError();
+        return false;
+    }
+    return true;
 }
 
 Inbox::~Inbox()
@@ -95,29 +130,14 @@ void Inbox::on_guiButton_clicked()
         errorMessage += "Hãy chọn một người nhận khả thi!";
     }
     if (errorMessage.isEmpty()) {
-        bool ok = true;
-        QSqlQuery query(0, db);
-        query.prepare("SELECT account_id FROM account WHERE account = ?");
-        query.addBindValue(ui->nguoiNhan->currentText());
-        ok &= query.exec();
-        query.next();
-        int receiver_id = query.value(0).toInt();
-        query.prepare("INSERT INTO message(sender, receiver, title, content) VALUES(?, ?, ?, ?)");
-        query.addBindValue(user_id);
-        query.addBindValue(receiver_id);
-        query.addBindValue(ui->tuaDe->text().isEmpty() ? tr("(Không có tiêu đề)") :ui->tuaDe->text());
-        query.addBindValue(ui->loiNhan->toPlainText());
-        ok &= query.exec();
-        if (ok) {
+        if (sendMessage(ui->nguoiNhan->currentText(), ui->tuaDe->text().isEmpty() ? tr("Không có tiêu đề") : ui->tuaDe->text(), ui->loiNhan->toPlainText())) {
             model->select();
             ui->loiNhan->clear();
             ui->nguoiNhan->clearEditText();
             ui->tuaDe->clear();
-            QMessageBox::information(this, tr("Gửi tin nhắn thành công"), tr("Đã gửi tin nhắn thành công!"));
-
+            QMessageBox::information(this, tr("Gửi tin nhắn"), tr("Đã gửi tin nhắn thành công!"));
         } else {
-            qDebug() << query.lastError();
-            QMessageBox::warning(this, tr("Gửi tin nhắn thất bại"), tr("Đã có lỗi xảy ra!"));
+            QMessageBox::warning(this, tr("Gửi tin nhắn"), tr("Đã có lỗi xảy ra!"));
         }
     } else {
         QMessageBox::warning(this, tr("Gửi tin nhắn"), errorMessage);
@@ -135,6 +155,7 @@ void Inbox::on_messageRead(QModelIndex selected)
         }
     }
 }
+
 
 void Inbox::on_capNhatButton_clicked()
 {

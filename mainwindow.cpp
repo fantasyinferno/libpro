@@ -16,21 +16,48 @@
 #include <QSqlRelationalTableModel>
 #include "addbook.h"
 #include "finedialog.h"
+#include "inbox.h"
 
 MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    introForm = new IntroForm(this, db);
+    information = new Information(this, db);
+    inbox = new Inbox(this, db);
+    about = new About(this);
+    introForm->setWindowTitle(tr("Đăng nhập/Đăng ký"));
+    information->setWindowTitle(tr("Thông tin cá nhân"));
+    inbox->setWindowTitle(tr("Hộp thư"));
+    about->setWindowTitle(tr("Về LIBPRO"));
+    QObject::connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), this, SLOT(on_dangNhapThanhCong(int, QString)));
+    QObject::connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), information, SLOT(on_dangNhapThanhCong(int, QString)));
+    QObject::connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), inbox, SLOT(on_dangNhapThanhCong(int,QString)));
+    QObject::connect(information, SIGNAL(avatarChanged(const QPixmap*)), this, SLOT(on_avatarChanged(const QPixmap*)));
+    QObject::connect(this, SIGNAL(updateMyBooks(const QModelIndexList&)), information, SLOT(on_updateMyBooks(const QModelIndexList&)));
+    /* TODO: Thay thế 5 cái này bằng slots của buttons */
+    QObject::connect(this, SIGNAL(dangXuat()), information, SLOT(on_dangXuat()));
+    QObject::connect(this, SIGNAL(dangXuat()), inbox, SLOT(on_dangXuat()));
+    QObject::connect(this, SIGNAL(formRequest(int)), introForm, SLOT(on_formRequest(int)));
+    QObject::connect(this, SIGNAL(informationRequest()), information, SLOT(on_informationRequest()));
+    QObject::connect(this, SIGNAL(inboxRequest()), inbox, SLOT(show()));
+    /* */
+    QObject::connect(this, SIGNAL(aboutTriggered()), about, SLOT(show()));
+    QObject::connect(information, SIGNAL(rolesLoaded(QList<int>&)), this, SLOT(on_rolesLoaded(QList<int>&)));
     initializeGUILogic(database);
     user_id = 0;
     user = "";
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+
 QSqlDatabase MainWindow::getDatabase() {
     return db;
 }
@@ -209,7 +236,7 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
 
         // Có thể chấp thuận yêu cầu sách
         requestBookModel = new QSqlRelationalTableModel(this, db);
-        requestBookModel->setEditStrategy(QSqlTableModel::OnFieldChange);
+        requestBookModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
         requestBookModel->setTable("account_book");
         bookIdIdx = requestBookModel->fieldIndex("book_id");
         accountIdIdx = requestBookModel->fieldIndex("account_id");
@@ -241,7 +268,7 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
 
 void MainWindow::on_muonButton_clicked()
 {
-    if (user_id < 0) {
+    if (user_id != 0) {
         QModelIndexList list = ui->danhMucSach->selectionModel()->selectedRows(0);
         if (!list.isEmpty()) {
             QSqlQuery query(0, db);
@@ -270,15 +297,40 @@ void MainWindow::on_chapThuanButton_clicked()
 {
     QModelIndexList list = ui->muonSachTable->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status"));
     if (!list.isEmpty()) {
+        bool ok = true;
+        // Lấy danh sách tất cả sách đã chọn
         for (QModelIndex &i: list) {
-            requestBookModel->setData(i, 2);
+            // Set trạng thái thành "Đang mượn"
+            if (!(ok = requestBookModel->setData(i, 2))) {
+                break;
+            }
+            // Nhập ngày mượn và ngày cần trả
             QDate today = QDate::currentDate();
-            requestBookModel->setData(i.sibling(i.row(), requestBookModel->fieldIndex("start_date")), today);
-            requestBookModel->setData(i.sibling(i.row(), requestBookModel->fieldIndex("due_date")), today.addDays(15));
+            if (!(ok = requestBookModel->setData(i.sibling(i.row(), requestBookModel->fieldIndex("start_date")), today))) {
+                break;
+            }
+            if (!(ok = requestBookModel->setData(i.sibling(i.row(), requestBookModel->fieldIndex("due_date")), today.addDays(15)))) {
+                break;
+            }
+            // Gửi tin nhắn đến thành viên
+            QString username = i.sibling(i.row(), accountIdIdx).data().toString();
+            QString bookName = i.sibling(i.row(), bookIdIdx).data().toString();
+            int request_id = i.sibling(i.row(), 0).data().toInt();
+            QString text = QString("Bạn đã mượn thành công cuốn %1. Trong vòng 15 ngày bạn vui lòng đến cơ sở gần nhất để trả sách. Chúc bạn đọc sách vui vẻ!").arg(bookName);
+            QString title = QString("LIBPRO - Mượn Sách #%1: Mượn sách thành công!").arg(request_id);
+            ok = inbox->sendMessage(username, title, text);
         }
-        requestBookModel->select();
-        QMessageBox::information(this, "Thành công!", "Bạn đã cho phép độc giả mượn sách!");
-        // Gửi tin nhắn đến thành viên
+        if (ok) {
+            // Gửi yêu cầu
+            requestBookModel->submitAll();
+            // Cập nhật lại model
+            requestBookModel->select();
+            QMessageBox::information(this, "Thành công!", "Bạn đã cho phép độc giả mượn sách!");
+        } else {
+            // Reset model
+            requestBookModel->select();
+            QMessageBox::warning(this, "Thất bại!", "Đã có lỗi xảy ra!");
+        }
     }
 }
 
@@ -286,12 +338,30 @@ void MainWindow::on_tuChoiButton_clicked()
 {
     QModelIndexList list = ui->muonSachTable->selectionModel()->selectedRows(requestBookModel->fieldIndex("book_status"));
     if (!list.isEmpty()) {
+        bool ok = true;
+        // Lấy danh sách tất cả sách đã chọn
         for (QModelIndex &i: list) {
-            requestBookModel->removeRow(i.row());
+            // Lấy id của yêu cầu trước khi xóa
+            int request_id = i.sibling(i.row(), 0).data().toInt();
+            QString username = i.sibling(i.row(), accountIdIdx).data().toString();
+            QString bookName = i.sibling(i.row(), bookIdIdx).data().toString();
+            // Xóa yêu cầu
+            if (!(ok = requestBookModel->removeRow(i.row()))) {
+                break;
+            }
+            // Gửi tin nhắn đến thành viên
+            QString text = QString("Chào bạn! Hiện tại yêu cầu mượn cuốn %1 không thể thực hiện được. Xin bạn vui lòng thử lại vào thời gian sau.").arg(bookName);
+            QString title = QString("LIBPRO - Mượn sách #%1: Mượn sách không thành công!").arg(request_id);
+            ok = inbox->sendMessage(username, title, text);
         }
-        requestBookModel->select();
-        QMessageBox::information(this, "Thành công!", "Bạn đã từ chối yêu cầu của độc giả!");
-        // Gửi tin nhắn đến thành viên
+        if (ok) {
+            requestBookModel->submitAll();
+            requestBookModel->select();
+            QMessageBox::information(this, "Thành công!", "Bạn đã từ chối yêu cầu của độc giả!");
+        } else {
+            requestBookModel->select();
+            QMessageBox::warning(this, "Thất bại!", "Đã có lỗi xảy ra!");
+        }
     }
 }
 
@@ -304,7 +374,7 @@ void MainWindow::on_phatButton_clicked()
         list = ui->matSachTable->selectionModel()->selectedRows(bookStatusIdIdx);
     }
     if (!list.isEmpty()) {
-        FineDialog *fineDialog = new FineDialog(this, db, list);
+        FineDialog *fineDialog = new FineDialog(this, db, list, inbox);
         fineDialog->setWindowTitle("Phạt");
         // Thuộc tính này giúp fineDialog tự giải phóng bộ nhớ sau khi tắt dialog
         fineDialog->setAttribute(Qt::WA_DeleteOnClose);

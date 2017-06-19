@@ -9,6 +9,8 @@
 #include <QLabel>
 #include "information.h"
 #include "introform.h"
+#include "about.h"
+#include "inbox.h"
 
 namespace Ui {
 class MainWindow;
@@ -39,6 +41,13 @@ private:
     int user_id;
     // Vai trò
     QList<int> rolesList;
+
+    // UI
+    IntroForm *introForm;
+    Information *information;
+    About *about;
+    Inbox *inbox;
+
 signals:
     void updateMyBooks(const QModelIndexList&);
     void formRequest(int);
