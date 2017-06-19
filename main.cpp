@@ -5,6 +5,7 @@
 #include "introform.h"
 #include "mainwindow.h"
 #include "about.h"
+#include "inbox.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -16,19 +17,23 @@ int main(int argc, char *argv[])
     MainWindow mainWindow(0, db);
     IntroForm introForm(&mainWindow, db);
     Information information(&mainWindow, db);
+    Inbox inbox(&mainWindow, db);
     About about(&mainWindow);
     introForm.setWindowTitle("Đăng nhập/Đăng ký");
     information.setWindowTitle("Thông tin cá nhân");
     about.setWindowTitle("Về LIBPRO");
     QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &mainWindow, SLOT(on_dangNhapThanhCong(int, QString)));
     QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &information, SLOT(on_dangNhapThanhCong(int, QString)));
+    QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &inbox, SLOT(on_dangNhapThanhCong(int,QString)));
     QObject::connect(&information, SIGNAL(avatarChanged(const QPixmap*)), &mainWindow, SLOT(on_avatarChanged(const QPixmap*)));
     QObject::connect(&mainWindow, SIGNAL(updateMyBooks(const QModelIndexList&)), &information, SLOT(on_updateMyBooks(const QModelIndexList&)));
     QObject::connect(&mainWindow, SIGNAL(dangXuat()), &information, SLOT(on_dangXuat()));
+    QObject::connect(&mainWindow, SIGNAL(dangXuat()), &inbox, SLOT(on_dangXuat()));
     QObject::connect(&mainWindow, SIGNAL(formRequest(int)), &introForm, SLOT(on_formRequest(int)));
     QObject::connect(&mainWindow, SIGNAL(informationRequest()), &information, SLOT(on_informationRequest()));
     QObject::connect(&mainWindow, SIGNAL(aboutTriggered()), &about, SLOT(show()));
     QObject::connect(&information, SIGNAL(rolesLoaded(QList<int>&)), &mainWindow, SLOT(on_rolesLoaded(QList<int>&)));
+    QObject::connect(&mainWindow, SIGNAL(inboxRequest()), &inbox, SLOT(show()));
     QIcon icon(":/media/images/logo.png");
     a.setWindowIcon(icon);
     mainWindow.setWindowTitle("LIBPRO");

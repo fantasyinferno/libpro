@@ -120,6 +120,13 @@ color: white;
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
+               <widget class="QPushButton" name="hopThuButton">
+                <property name="text">
+                 <string>Hộp thư đến</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="dangXuatButton">
                 <property name="autoFillBackground">
                  <bool>false</bool>

@@ -89,7 +89,7 @@ void MainWindow::initializeTable()
     bookMapper->addMapping(ui->tacGia, model->fieldIndex("author"));
     bookMapper->addMapping(ui->namSanXuat, model->fieldIndex("year"));
     bookMapper->addMapping(ui->biaSach, model->fieldIndex("cover"));
-    connect(ui->danhMucSach->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), bookMapper, SLOT(setCurrentModelIndex(QModelIndex)));
+    connect(ui->danhMucSach->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), bookMapper, SLOT(setCurrentModelIndex(QModelIndex)));
     connect(ui->danhMucSach->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), ui->hienThiSach, SLOT(show()));
     ui->hienThiSach->hide();
 }
@@ -109,6 +109,7 @@ void MainWindow::initializeButtons()
     ui->themSachButton->hide();
     ui->chapNhanSachButton->hide();
     ui->huySachButton->hide();
+    ui->hopThuButton->hide();
 }
 
 void MainWindow::enableLibrarianButtons(bool chapThuan, bool tuChoi, bool phat, bool xacNhan)
@@ -139,6 +140,7 @@ void MainWindow::on_dangXuatButton_clicked()
     // Thay đổi giao diện về lại ban đầu
     ui->username->setText("");
     ui->username->setEnabled(false);
+    ui->hopThuButton->hide();
     ui->dangXuatButton->hide();
     ui->dangKyButton->show();
     ui->dangNhapButton->show();
@@ -178,6 +180,7 @@ void MainWindow::on_username_clicked() {
 void MainWindow::on_dangNhapThanhCong(int id, QString username) {
     user = username;
     user_id = id;
+    ui->hopThuButton->show();
     ui->dangKyButton->hide();
     ui->dangNhapButton->hide();
     ui->dangXuatButton->show();
@@ -400,4 +403,9 @@ void MainWindow::on_themSachButton_clicked()
     addBook->show();
     // Cập nhật lại model nếu có sách mới thêm vào
     QObject::connect(addBook, SIGNAL(accepted()), model, SLOT(select()));
+}
+
+void MainWindow::on_hopThuButton_clicked()
+{
+    emit inboxRequest();
 }

@@ -45,6 +45,7 @@ signals:
     void dangXuat();
     void informationRequest();
     void aboutTriggered();
+    void inboxRequest();
 private slots:
     void on_thanhTimKiem_returnPressed();
     void on_dangXuatButton_clicked();
@@ -72,6 +73,7 @@ private slots:
     void initializeButtons();
     void enableLibrarianButtons(bool, bool, bool, bool);
     void on_themSachButton_clicked();
+    void on_hopThuButton_clicked();
 };
 
 
