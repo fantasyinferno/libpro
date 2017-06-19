@@ -7,7 +7,7 @@
 #include <QItemSelection>
 #include <QDataWidgetMapper>
 #include <QSqlRelationalTableModel>
-
+#include <QList>
 
 namespace Ui {
 class Information;
@@ -18,13 +18,13 @@ class Information : public QDialog
     Q_OBJECT
 
 public:
-    explicit Information(QWidget *parent = 0);
+    explicit Information(QWidget *parent = 0, QSqlDatabase database = QSqlDatabase());
     ~Information();
     void load(QString, QString);
     void submitVt();
     void checkVt();
     void enableEdit(bool);
-
+    void submitAv();
 
 private slots:
     void on_hoanTatButton_clicked();
@@ -32,14 +32,24 @@ private slots:
     void on_dangNhapThanhCong(int, QString);
     void on_updateMyBooks(const QModelIndexList& selectedList);
     void on_huyButton_clicked();
+    void on_avatarButton_clicked();
+    void on_currentIndexChanged(int);
+    void on_informationRequest();
+    void on_dangXuat();
+    void on_matSachButton_clicked();
+
+    void on_tabWidget_currentChanged(int index);
 
 signals:
+    void avatarChanged(const QPixmap* pixmap);
+    void rolesLoaded(QList<int>&);
 private:
     QSqlDatabase db;
     Ui::Information *ui;
     QSqlRelationalTableModel *model, *bookModel;
     QDataWidgetMapper *mapper;
     QString user;
+    QList<int> rolesList;
     int user_id;
 };
 

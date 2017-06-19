@@ -7,22 +7,18 @@
 #include <QString>
 #include <QMessageBox>
 #include <QDebug>
-#include "readergui.h"
+#include <QFile>
+#include <QFileDialog>
+#include <QSqlError>
+#include <QBuffer>
 
-IntroForm::IntroForm(QWidget *parent) :
+IntroForm::IntroForm(QWidget *parent, QSqlDatabase database) :
     QDialog(parent),
     ui(new Ui::IntroForm)
 {
     ui->setupUi(this);
-    if (parent) {
-        db = dynamic_cast<ReaderGUI*>(parent)->getDatabase();
-    }
-    ui->dn_tdn->setFocus();
-    ui->dk_tdn->setFocus();
-
-    ui->dk_vt_reader->setChecked(true);
-    ui->dk_vt_manager->setChecked(false);
-    ui->dk_vt_librarian->setChecked(false);
+    this->setModal(true);
+    db = database;
 }
 
 IntroForm::~IntroForm()
@@ -58,6 +54,9 @@ void IntroForm::on_pushButton_clicked()
 void IntroForm::setTab(int i)
 {
     ui->tabWidget->setCurrentIndex(i);
+    if (i == 0)
+        ui->dn_tdn->setFocus();
+    else ui->dk_tdn->setFocus();
 }
 
 void IntroForm::on_dangKyButton_clicked()
@@ -92,10 +91,12 @@ void IntroForm::on_dangKyButton_clicked()
         QMessageBox::critical(this,"Mật khẩu","Nhập lại mật khẩu không đúng");
         return;
     }
-
     QSqlQuery query(0,db);
-    query.prepare("insert into account(account, password, status_id, fullname, identity_number, gender_id, birthdate, email, job) values(:tdn, :mk, :tt, :hvt, :cmnd, :gt, :ns, :em, :cv);");
-
+    QByteArray imageByteArray;
+    QBuffer inBuffer(&imageByteArray);
+    inBuffer.open(QIODevice::WriteOnly);
+    ui->avatar->pixmap()->save(&inBuffer, "PNG");
+    query.prepare("insert into account(account, password, status_id, fullname, identity_number, gender_id, birthdate, email, job, avatar) values(:tdn, :mk, :tt, :hvt, :cmnd, :gt, :ns, :em, :cv, :av);");
     query.bindValue(":tdn",ui->dk_tdn->text());
     query.bindValue(":mk",ui->dk_mk->text());
     query.bindValue(":tt",1);
@@ -105,6 +106,7 @@ void IntroForm::on_dangKyButton_clicked()
     query.bindValue(":ns", ui->dk_ns->date());
     query.bindValue(":cv",(ui->dk_cv->text()!=""? ui->dk_cv->text() : NULL));
     query.bindValue(":em",(ui->dk_em->text()!=""? ui->dk_em->text() : NULL));
+    query.bindValue(":av", imageByteArray);
     bool ok = query.exec();
     int id = query.lastInsertId().toInt();
     query.prepare("INSERT INTO account_role VALUES (?, ?)");
@@ -130,19 +132,28 @@ void IntroForm::on_dangKyButton_clicked()
     }
     else{
         QMessageBox::about(this,"Lỗi","Không tạo được tài khoản");
+        qDebug() << query.lastError();
+    }
+}
+
+void IntroForm::on_avatarButton_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Image Files (*.png *.jpg *.bmp)"));
+    if (!fileName.isEmpty()) {
+        QPixmap pixmap(fileName);
+        pixmap = pixmap.scaled(180, 180);
+        ui->avatar->setPixmap(pixmap);
     }
 }
 
 
-//
-
-void IntroForm::setType(bool isManager)
-{
-
-    ui->dk_vt_manager->setEnabled(isManager);
-    ui->dk_vt_librarian->setEnabled(isManager);
-    ui->dk_vt_reader->setEnabled(isManager);
-
+void IntroForm::on_formRequest(int tab) {
+    this->setTab(tab);
+    this->show();
 }
 
-
+void IntroForm::on_iAmYourParent(QWidget *widget)
+{
+    this->setParent(widget);
+    this->setWindowFlags(Qt::Dialog);
+}

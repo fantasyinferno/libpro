@@ -1,22 +1,24 @@
-#include "introform.h"
-#include "readergui.h"
 #include <QApplication>
 #include <QSqlDatabase>
 #include <QDir>
-#include "librariangui.h"
-#include "managergui.h"
+#include "information.h"
+#include "introform.h"
+#include "mainwindow.h"
+#include "about.h"
+#include "inbox.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    ReaderGUI readerGUI;
-    LibrarianGUI librarianGUI;
-    ManagerGUI managerGUI;
-    managerGUI.show();
-    readerGUI.show();
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("F:/SoftwareDevelopment/Qt/libpro/libpro.db");
+    if (!db.open()) {
+        return -1;
+    }
+    MainWindow mainWindow(0, db);
     QIcon icon(":/media/images/logo.png");
     a.setWindowIcon(icon);
-    readerGUI.setWindowTitle("LIBPRO");
-//    QObject::connect(&introForm, SIGNAL(dangNhapClicked(const QString)), &readerGUI, SLOT(on_display(const QString)));
+    mainWindow.setWindowTitle("LIBPRO");
+    mainWindow.show();
     return a.exec();
 }
 

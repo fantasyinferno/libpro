@@ -24,26 +24,36 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-    readergui.cpp \
     bookdelegate.cpp \
-    librariangui.cpp \
     information.cpp \
     introform.cpp \
-    managergui.cpp
+    accountdelegate.cpp \
+    about.cpp \
+    mainwindow.cpp \
+    finedialog.cpp \
+    addbook.cpp \
+    inbox.cpp \
+    messagemodel.cpp
 
 HEADERS  += introform.h \
-    readergui.h \
     bookdelegate.h \
-    librariangui.h \
     information.h \
-    managergui.h
+    accountdelegate.h \
+    about.h \
+    mainwindow.h \
+    finedialog.h \
+    addbook.h \
+    inbox.h \
+    messagemodel.h
 
 FORMS    += \
-    readergui.ui \
-    librariangui.ui \
     information.ui \
     introform.ui \
-    managergui.ui
+    about.ui \
+    mainwindow.ui \
+    finedialog.ui \
+    addbook.ui \
+    inbox.ui
 
 RESOURCES += \
     resources.qrc
