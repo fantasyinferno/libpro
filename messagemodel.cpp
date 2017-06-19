@@ -18,3 +18,5 @@ QVariant MessageModel::data(const QModelIndex &index, int role) const
     // Sử dụng QIdentityProxyModel đối với các role khác
     return QIdentityProxyModel::data(index, role);
 }
+
+

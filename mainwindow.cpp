@@ -16,6 +16,7 @@
 #include <QSqlRelationalTableModel>
 #include "addbook.h"
 #include "finedialog.h"
+#include "accountdelegate.h"
 #include "inbox.h"
 
 MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
@@ -91,9 +92,6 @@ void MainWindow::initializeTable()
     model->setHeaderData(5, Qt::Horizontal, tr("Năm sản xuất"));
     model->setHeaderData(6, Qt::Horizontal, tr("Nội dung"));
     model->setHeaderData(7, Qt::Horizontal, tr("Trạng thái"));
-    // Cột thứ 8!
-    model->insertColumn(8);
-    model->setHeaderData(8, Qt::Horizontal, tr("Tùy chọn"));
     // Thiết lập delegate
     BookDelegate *bd = new BookDelegate(ui->danhMucSach);
     // Thiết lập View
@@ -263,6 +261,82 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         ui->matSachTable->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->matSachTable->setColumnHidden(requestBookModel->fieldIndex("account_book_id"), true);
         on_tabWidget_currentChanged(ui->tabWidget->currentIndex());
+    }
+    if (rolesList.contains(3)) {
+        // Thiết lập memberModel
+        memberModel = new QSqlRelationalTableModel(new QObject(), db);
+        memberModel->setTable("account");
+        int genderIdx = memberModel->fieldIndex("gender_id");
+        int statusIdx = memberModel->fieldIndex("status_id");
+        memberModel->setRelation(genderIdx, QSqlRelation("gender", "gender_id", "gender"));
+        memberModel->setRelation(statusIdx, QSqlRelation("status", "status_id", "status"));
+
+        QSqlTableModel *relModelGender = memberModel->relationModel(genderIdx);
+        QSqlTableModel *relModelStatus = memberModel->relationModel(statusIdx);
+        ui->gioiTinh->setModel(relModelGender);
+        ui->gioiTinh->setModelColumn(relModelGender->fieldIndex("gender"));
+        ui->tinhTrang->setModel(relModelStatus);
+        ui->tinhTrang->setModelColumn(relModelStatus->fieldIndex("status"));
+
+        memberModel->setHeaderData(0, Qt::Horizontal, tr("ID"));
+        memberModel->setHeaderData(1, Qt::Horizontal, tr("Tên đăng nhập"));
+        memberModel->setHeaderData(2, Qt::Horizontal, tr("Mật khẩu"));
+        memberModel->setHeaderData(3, Qt::Horizontal, tr("Tình trạng"));
+        memberModel->setHeaderData(4, Qt::Horizontal, tr("Họ và tên"));
+        memberModel->setHeaderData(5, Qt::Horizontal, tr("CMND"));
+        memberModel->setHeaderData(6, Qt::Horizontal, tr("Giới tính"));
+        memberModel->setHeaderData(7, Qt::Horizontal, tr("Ngày sinh"));
+        memberModel->setHeaderData(8, Qt::Horizontal, tr("Email"));
+        memberModel->setHeaderData(9, Qt::Horizontal, tr("Nghề nghiệp"));
+        memberModel->setHeaderData(10, Qt::Horizontal, tr("Ảnh đại diện"));
+        memberModel->select();
+        // Thiết lập View
+        ui->danhSachThanhVien->setModel(memberModel);
+        ui->danhSachThanhVien->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui->danhSachThanhVien->setItemDelegate(new AccountDelegate(this));
+        ui->danhSachThanhVien->horizontalHeader()->setVisible(true);
+        ui->danhSachThanhVien->setColumnWidth(0, 30);
+        ui->danhSachThanhVien->setColumnWidth(1, 150);
+        ui->danhSachThanhVien->setColumnWidth(2, 120);
+        ui->danhSachThanhVien->setColumnWidth(3, 80);
+        ui->danhSachThanhVien->setColumnWidth(4, 150);
+        ui->danhSachThanhVien->setColumnWidth(5, 100);
+        ui->danhSachThanhVien->setColumnWidth(6, 80);
+        ui->danhSachThanhVien->setColumnWidth(7, 100);
+        ui->danhSachThanhVien->setColumnWidth(8, 150);
+        ui->danhSachThanhVien->setColumnWidth(9, 150);
+        ui->danhSachThanhVien->setColumnHidden(2, true);
+        QObject::connect(ui->danhSachThanhVien->selectionModel(), SIGNAL(selectionChanged( const QItemSelection &, const QItemSelection &)), SLOT(on_selectionChanged(const QItemSelection &, const QItemSelection &)));
+        memberMapper = new QDataWidgetMapper(this);
+        memberMapper->setModel(memberModel);
+        memberMapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
+        memberMapper->setItemDelegate(new AccountDelegate(this));;
+        memberMapper->addMapping(ui->id, memberModel->fieldIndex("account_id"));
+        memberMapper->addMapping(ui->tenDangNhap, memberModel->fieldIndex("account"));
+        memberMapper->addMapping(ui->matKhau, memberModel->fieldIndex("password"));
+        memberMapper->addMapping(ui->tinhTrang, memberModel->fieldIndex("status_id"));
+        memberMapper->addMapping(ui->hoVaTen, memberModel->fieldIndex("fullname"));
+        memberMapper->addMapping(ui->CMND, memberModel->fieldIndex("identity_number"));
+        memberMapper->addMapping(ui->gioiTinh, genderIdx);
+        memberMapper->addMapping(ui->tinhTrang, statusIdx);
+        memberMapper->addMapping(ui->email, memberModel->fieldIndex("email"));
+        memberMapper->addMapping(ui->congViec, memberModel->fieldIndex("job"));
+        memberMapper->addMapping(ui->ngaySinh, memberModel->fieldIndex("birthdate"));
+        memberMapper->addMapping(ui->avatar, memberModel->fieldIndex("avatar"));
+        memberMapper->toFirst();
+
+        checkVt();
+
+        QObject::connect(ui->danhSachThanhVien->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), memberMapper, SLOT(setCurrentModelIndex(QModelIndex)));
+        QObject::connect(ui->danhSachThanhVien->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(checkVt()));
+
+        ui->id->setEnabled(false);
+        ui->tenDangNhap->setEnabled(false);
+
+        QStringList gioitinh=(QStringList()<<"Tất cả"<<"Nam"<<"Nữ");
+        QStringList tinhtrang=(QStringList()<<"Tất cả"<<"Hoạt động"<<"Bị khóa");
+        ui->combo_gioitinh->addItems(gioitinh);
+        ui->combo_tinhtrang->addItems(tinhtrang);
     }
 }
 
@@ -486,4 +560,180 @@ void MainWindow::on_themSachButton_clicked()
 void MainWindow::on_hopThuButton_clicked()
 {
     emit inboxRequest();
+}
+
+void MainWindow::on_timKiemButton_2_clicked()
+{
+    on_thanhTimKiem_2_returnPressed();
+}
+
+void MainWindow::on_thanhTimKiem_2_returnPressed()
+{
+
+
+//    QString type = ui->luaChon->text();
+    QString keyword = ui->thanhTimKiem->text();
+
+    QString s="";
+
+    if (ui->f_id->isChecked())
+    {
+        qDebug()<<"id='"+keyword+"'";
+        model->setFilter("account_id="+keyword);
+        return;
+    }
+
+    if (ui->f_tendangnhap->isChecked())
+    {
+        s=s+((s=="")? "(" : " OR ")+"account LIKE " + ((keyword=="")? "'%'" : "'%%1%'");
+    }
+
+    if (ui->f_hovaten->isChecked())
+    {
+        s=s+((s=="")? "(" : " OR ")+"fullname LIKE " + ((keyword=="")? "'%'" : "'%%1%'");
+    }
+
+    if (ui->f_cmnd->isChecked())
+    {
+        s=s+((s=="")? "(" : " OR ")+"identity_number LIKE " + ((keyword=="")? "'%'" : "'%%1%'");
+    }
+
+    s=s+((s=="")? "" : ") ");
+
+    if (ui->combo_gioitinh->currentText()!="Tất cả")
+    {
+        s=s+((s=="")? "" : " AND ")+"gender='"+ui->combo_gioitinh->currentText()+"'";
+    }
+
+    if (ui->combo_tinhtrang->currentText()!="Tất cả")
+    {
+        s=s+((s=="")? "" : " AND ")+"status='"+ui->combo_tinhtrang->currentText()+"'";
+    }
+    if (s=="")
+    {
+        model->setFilter("");
+        return;
+    }
+
+    if (keyword!="")
+        s=s.arg(keyword);
+    qDebug()<<s;
+    model->setFilter(s);
+
+}
+
+void MainWindow::on_xoaButton_clicked()
+{
+    QSqlQuery query(0, db);
+    query.prepare("delete from account_role where account_id= :id");
+    query.bindValue(":id", ui->id->text());
+    query.exec();
+
+    query.prepare("delete from account where account_id= :id");
+    query.bindValue(":id", ui->id->text());
+    bool ms=query.exec();
+    if (ms)
+        QMessageBox::about(this,"Xóa tài khoản","Xóa tài khoản thành công!");
+    else
+        QMessageBox::about(this,"Xóa tài khoản","Xóa tài khoản thất bại!");
+}
+
+void MainWindow::submitVt()
+{
+    QSqlQuery query(0,db);
+
+    query.prepare("select account_id from account where account = :tdn;");
+    query.bindValue(":tdn", ui->tenDangNhap->text());
+    query.exec();
+    query.next();
+    int id = query.value(0).toInt();
+
+    query.prepare("delete from account_role where account_id = :id;");
+    query.bindValue(":id", id);
+    query.exec();
+    bool ms;
+    // TODO: replace account's name with it's id. Connect checkboxes to the model.
+    if (ui->librarian->isChecked())
+    {
+        query.prepare("insert into account_role values(:id, :role);");
+        query.bindValue(":id",id);
+        query.bindValue(":role", 2);
+        ms=query.exec();
+    }
+
+    if (ui->manager->isChecked())
+    {
+        query.prepare("insert into account_role values(:id, :role);");
+        query.bindValue(":id",id);
+        query.bindValue(":role", 3);
+        ms=query.exec();
+    }
+
+    if (ui->reader->isChecked())
+    {
+        query.prepare("insert into account_role values(:id, :role);");
+        query.bindValue(":id",id);
+        query.bindValue(":role", 1);
+        ms=query.exec();
+    }
+
+    if (ms)
+    {
+        QMessageBox::about(this,"Cập nhật","Cập nhật thành công");
+    }
+    else
+    {
+        QMessageBox::about(this,"Cập nhật","Cập nhật thất bại");
+        qDebug() << query.lastError();
+    }
+}
+
+void MainWindow::on_thayDoiButton_clicked()
+{
+    memberMapper->submit();
+    submitVt();
+
+    QSqlQuery query(0,db);
+    qDebug()<<ui->tinhTrang->currentText();
+    qDebug()<<ui->id->text();
+
+    query.prepare("update account set status_id=:tt where account_id=:id");
+    query.bindValue(":tt",(ui->tinhTrang->currentText()=="Hoạt động")? "1" : "2");
+    query.bindValue(":id",ui->id->text());
+    qDebug()<<query.exec();
+
+    query.prepare("update account set gender_id=:gt where account_id=:id");
+    query.bindValue(":gt",ui->gioiTinh->currentText()=="Nam"? "1" : "2");
+    query.bindValue(":id",ui->id->text());
+    qDebug()<<query.exec();
+}
+
+void MainWindow::checkVt() {
+
+    ui->reader->setChecked(false);
+    ui->manager->setChecked(false);
+    ui->librarian->setChecked(false);
+
+    QSqlQuery query(0, db);
+
+    query.prepare("select account_id from account where account = :tdn;");
+    query.bindValue(":tdn", ui->tenDangNhap->text());
+    query.exec();
+    query.next();
+//    int id = query.value(0).toInt();
+
+    query.prepare("SELECT * FROM account_role WHERE account_id = :id");
+    query.bindValue(":id", ui->id->text());
+    query.exec();
+
+    while (query.next()) {
+        int role = query.value(1).toInt();
+        if (role == 1) {
+            ui->reader->setChecked(true);
+        } else if (role == 2) {
+            ui->librarian->setChecked(true);
+        } else{
+            ui->manager->setChecked(true);
+        }
+    }
 }
