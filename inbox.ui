@@ -100,6 +100,14 @@
         </layout>
        </widget>
        <widget class="QWidget" name="soanTinNhanPage">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>775</width>
+          <height>540</height>
+         </rect>
+        </property>
         <attribute name="label">
          <string>Soạn tin nhắn</string>
         </attribute>
@@ -160,6 +168,9 @@
       </item>
       <item>
        <widget class="QLineEdit" name="nguoiGuiLineEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
         <property name="placeholderText">
          <string>Người gửi/Người nhận</string>
         </property>
@@ -167,6 +178,9 @@
       </item>
       <item>
        <widget class="QPlainTextEdit" name="loiNhanTextEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
         <property name="plainText">
          <string/>
         </property>
