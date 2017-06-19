@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     mainwindow.cpp \
     finedialog.cpp \
     addbook.cpp \
-    inbox.cpp
+    inbox.cpp \
+    messagemodel.cpp
 
 HEADERS  += introform.h \
     bookdelegate.h \
@@ -42,7 +43,8 @@ HEADERS  += introform.h \
     mainwindow.h \
     finedialog.h \
     addbook.h \
-    inbox.h
+    inbox.h \
+    messagemodel.h
 
 FORMS    += \
     information.ui \

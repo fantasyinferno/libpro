@@ -1,6 +1,7 @@
 #include "inbox.h"
 #include "ui_inbox.h"
 #include "mainwindow.h"
+#include "messagemodel.h"
 #include <QSqlQuery>
 #include <QSqlRelationalDelegate>
 #include <QSqlRelation>
@@ -20,25 +21,37 @@ Inbox::Inbox(QWidget *parent, QSqlDatabase database) :
     model->setHeaderData(model->fieldIndex("title"), Qt::Horizontal, tr("Tiêu đề"));
     model->setHeaderData(model->fieldIndex("content"), Qt::Horizontal, tr("Nội dung"));
     model->setHeaderData(model->fieldIndex("send_at"), Qt::Horizontal, tr("Ngày gửi"));
-    ui->hopThuDenTable->setModel(model);
+    messageModel = new MessageModel(this);
+    messageModel->setSourceModel(model);
+
+    // Hộp thư đến và đi
+    ui->hopThuDenTable->setModel(messageModel);
     ui->hopThuDenTable->setItemDelegate(new QSqlRelationalDelegate(this));
-    ui->hopThuDenTable->setColumnHidden(0, true);
-    ui->hopThuDenTable->sortByColumn(model->fieldIndex("send_at"), Qt::AscendingOrder);
+    ui->hopThuDenTable->setColumnHidden(model->fieldIndex("message_id"), true);
+    ui->hopThuDenTable->setColumnHidden(model->fieldIndex("is_read"), true);
+    ui->hopThuDenTable->sortByColumn(model->fieldIndex("send_at"), Qt::DescendingOrder);
     ui->hopThuDiTable->setModel(model);
     ui->hopThuDiTable->setItemDelegate(new QSqlRelationalDelegate(this));
     ui->hopThuDiTable->setColumnHidden(0, true);
-    ui->hopThuDenTable->sortByColumn(model->fieldIndex("send_at"), Qt::AscendingOrder);
+    ui->hopThuDenTable->sortByColumn(model->fieldIndex("send_at"), Qt::DescendingOrder);
+
     int receiverIdx = model->fieldIndex("receiver");
     int senderIdx = model->fieldIndex("sender");
     model->setRelation(receiverIdx, QSqlRelation("account", "account_id", "account"));
     model->setRelation(senderIdx, QSqlRelation("account", "account_id", "account"));
     model->select();
-    QDataWidgetMapper *mapper = new QDataWidgetMapper(this);
-    mapper->setModel(model);
-    mapper->setItemDelegate(new QSqlRelationalDelegate(this));
-    mapper->addMapping(ui->loiNhanTextEdit, model->fieldIndex("content"));
-    connect(ui->hopThuDenTable->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), mapper, SLOT(setCurrentModelIndex(QModelIndex)));
-    connect(ui->hopThuDiTable->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), mapper, SLOT(setCurrentModelIndex(QModelIndex)));
+    int contentIdx = model->fieldIndex("content");
+    QDataWidgetMapper *hopThuDenMapper = new QDataWidgetMapper(this);
+    hopThuDenMapper->setItemDelegate(new QSqlRelationalDelegate(this));
+    hopThuDenMapper->setModel(messageModel);
+    hopThuDenMapper->addMapping(ui->loiNhanTextEdit, contentIdx);
+    connect(ui->hopThuDenTable->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), hopThuDenMapper, SLOT(setCurrentModelIndex(QModelIndex)));
+    QDataWidgetMapper *hopThuDiMapper = new QDataWidgetMapper(this);
+    hopThuDiMapper->setItemDelegate(new QSqlRelationalDelegate(this));
+    hopThuDiMapper->setModel(model);
+    hopThuDiMapper->addMapping(ui->loiNhanTextEdit, contentIdx);
+    connect(ui->hopThuDiTable->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), hopThuDiMapper, SLOT(setCurrentModelIndex(QModelIndex)));
+
     connect(ui->hopThuDenTable->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(on_messageRead(QModelIndex)));
     ui->nguoiNhan->setModel(model->relationModel(receiverIdx));
     ui->nguoiNhan->setModelColumn(1);
@@ -97,7 +110,11 @@ void Inbox::on_guiButton_clicked()
         ok &= query.exec();
         if (ok) {
             model->select();
+            ui->loiNhan->clear();
+            ui->nguoiNhan->clearEditText();
+            ui->tuaDe->clear();
             QMessageBox::information(this, tr("Gửi tin nhắn thành công"), tr("Đã gửi tin nhắn thành công!"));
+
         } else {
             qDebug() << query.lastError();
             QMessageBox::warning(this, tr("Gửi tin nhắn thất bại"), tr("Đã có lỗi xảy ra!"));
@@ -112,12 +129,9 @@ void Inbox::on_messageRead(QModelIndex selected)
     if (selected.isValid()) {
         QModelIndex is_read = selected.sibling(selected.row(), model->fieldIndex("is_read"));
         if (is_read.data().toInt() == 0) {
-            model->setData(selected.sibling(selected.row(), model->fieldIndex("is_read")), true);
-            model->submit();
-            model->select();
+            // submit thông qua messageModel
+            messageModel->setData(selected.sibling(selected.row(), model->fieldIndex("is_read")), true);
+            messageModel->submit();
         }
     }
-}
-void Inbox::foo() {
-    model->rowCount();
 }

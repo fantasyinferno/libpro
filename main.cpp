@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
     About about(&mainWindow);
     introForm.setWindowTitle("Đăng nhập/Đăng ký");
     information.setWindowTitle("Thông tin cá nhân");
+    inbox.setWindowTitle("Hộp thư");
     about.setWindowTitle("Về LIBPRO");
     QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &mainWindow, SLOT(on_dangNhapThanhCong(int, QString)));
     QObject::connect(&introForm, SIGNAL(dangNhapThanhCong(int, QString)), &information, SLOT(on_dangNhapThanhCong(int, QString)));

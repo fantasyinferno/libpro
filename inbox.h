@@ -1,6 +1,6 @@
 #ifndef INBOX_H
 #define INBOX_H
-
+#include "messagemodel.h"
 #include <QDialog>
 #include <QSqlDatabase>
 #include <QSqlRelationalTableModel>
@@ -27,10 +27,11 @@ private slots:
 private:
     Ui::Inbox *ui;
     QSqlDatabase db;
+    MessageModel *messageModel;
     QSqlRelationalTableModel *model;
+
     int user_id;
     QString user;
-    QDataWidgetMapper *mapper;
 };
 
 #endif // INBOX_H
