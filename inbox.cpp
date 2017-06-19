@@ -135,3 +135,8 @@ void Inbox::on_messageRead(QModelIndex selected)
         }
     }
 }
+
+void Inbox::on_capNhatButton_clicked()
+{
+    model->select();
+}
