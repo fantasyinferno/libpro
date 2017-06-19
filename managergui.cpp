@@ -65,11 +65,8 @@ void ManagerGUI::initializeTable()
     // Cột thứ 10!
     model->insertColumn(10);
     model->setHeaderData(10, Qt::Horizontal, tr("Tùy chọn"));
-    // Thiết lập delegate
-//    BookDelegate *bd = new BookDelegate(ui->danhSachThanhVien);
     // Thiết lập View
     ui->danhSachThanhVien->setModel(model);
-//    ui->danhSachThanhVien->setItemDelegate(bd);
     ui->danhSachThanhVien->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->danhSachThanhVien->horizontalHeader()->setVisible(true);
     ui->danhSachThanhVien->setColumnWidth(0, 30);
@@ -101,7 +98,9 @@ void ManagerGUI::initializeTable()
     mapper->toFirst();
 
     checkVt();
-    connect(ui->danhSachThanhVien->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), mapper, SLOT(setCurrentModelIndex(QModelIndex)));
+
+    QObject::connect(ui->danhSachThanhVien->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), mapper, SLOT(setCurrentModelIndex(QModelIndex)));
+    QObject::connect(ui->danhSachThanhVien->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(checkVt()));
 
     ui->id->setEnabled(false);
     ui->tenDangNhap->setEnabled(false);
@@ -113,14 +112,6 @@ void ManagerGUI::initializeTable()
 
 }
 
-void ManagerGUI::on_dangKyButton_clicked()
-{
-    introform = new IntroForm();
-    introform->setType(true);
-    introform->show();
-    introform->setTab(1);
-
-}
 
 void ManagerGUI::checkVt() {
 
@@ -134,7 +125,7 @@ void ManagerGUI::checkVt() {
     query.bindValue(":tdn", ui->tenDangNhap->text());
     query.exec();
     query.next();
-    int id = query.value(0).toInt();
+//    int id = query.value(0).toInt();
 
     query.prepare("SELECT * FROM account_role WHERE account_id = :id");
     query.bindValue(":id", ui->id->text());
@@ -149,7 +140,6 @@ void ManagerGUI::checkVt() {
         } else{
             ui->manager->setChecked(true);
         }
-        qDebug()<<"a";
     }
 }
 
@@ -207,12 +197,21 @@ void ManagerGUI::on_thayDoiButton_clicked()
 {
     mapper->submit();
     submitVt();
-//    QSqlQuery query(0,db);
-//    query.prepare("update account set status_id=:tt where id=:id");
-//    query.bindValue(":id",ui->);
+
+    QSqlQuery query(0,db);
+    qDebug()<<ui->tinhTrang->currentText();
+    qDebug()<<ui->id->text();
+
+    query.prepare("update account set status_id=:tt where account_id=:id");
+    query.bindValue(":tt",(ui->tinhTrang->currentText()=="Hoạt động")? "1" : "2");
+    query.bindValue(":id",ui->id->text());
+    qDebug()<<query.exec();
+
+    query.prepare("update account set gender_id=:gt where account_id=:id");
+    query.bindValue(":gt",ui->gioiTinh->currentText()=="Nam"? "1" : "2");
+    query.bindValue(":id",ui->id->text());
+    qDebug()<<query.exec();
 }
-
-
 
 void ManagerGUI::on_xoaButton_clicked()
 {
@@ -249,18 +248,20 @@ void ManagerGUI::on_thanhTimKiem_returnPressed()
 
     if (ui->f_tendangnhap->isChecked())
     {
-        s=s+((s=="")? "" : " OR ")+"account LIKE '%%1%'";
+        s=s+((s=="")? "(" : " OR ")+"account LIKE " + ((keyword=="")? "'%'" : "'%%1%'");
     }
 
     if (ui->f_hovaten->isChecked())
     {
-        s=s+((s=="")? "" : " OR ")+"fullname LIKE '%%1%'";
+        s=s+((s=="")? "(" : " OR ")+"fullname LIKE " + ((keyword=="")? "'%'" : "'%%1%'");
     }
 
     if (ui->f_cmnd->isChecked())
     {
-        s=s+((s=="")? "" : " OR ")+"identity_number LIKE '%%1%'";
+        s=s+((s=="")? "(" : " OR ")+"identity_number LIKE " + ((keyword=="")? "'%'" : "'%%1%'");
     }
+
+    s=s+((s=="")? "" : ") ");
 
     if (ui->combo_gioitinh->currentText()!="Tất cả")
     {

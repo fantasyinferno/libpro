@@ -27,7 +27,6 @@ public:
 
 
 private slots:
-    void on_dangKyButton_clicked();
     void submitVt();
     void checkVt();
     void on_thayDoiButton_clicked();
