@@ -312,6 +312,7 @@ void Information::on_matSachButton_clicked()
             for (QModelIndex index: list) {
                 bookModel->setData(index, 4);
             }
+            bookModel->select();
             QMessageBox::information(this, "Cập nhật thành công!", "Chúng tôi đã báo cáo hành vi làm mất sách của bạn. Vui lòng chờ xử lý từ thủ thư.");
         }
      }

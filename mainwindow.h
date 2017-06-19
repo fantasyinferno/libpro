@@ -9,6 +9,8 @@
 #include <QLabel>
 #include "information.h"
 #include "introform.h"
+#include "about.h"
+#include "inbox.h"
 
 namespace Ui {
 class MainWindow;
@@ -39,12 +41,20 @@ private:
     int user_id;
     // Vai trò
     QList<int> rolesList;
+
+    // UI
+    IntroForm *introForm;
+    Information *information;
+    About *about;
+    Inbox *inbox;
+
 signals:
     void updateMyBooks(const QModelIndexList&);
     void formRequest(int);
     void dangXuat();
     void informationRequest();
     void aboutTriggered();
+    void inboxRequest();
 private slots:
     void on_thanhTimKiem_returnPressed();
     void on_dangXuatButton_clicked();
@@ -72,6 +82,7 @@ private slots:
     void initializeButtons();
     void enableLibrarianButtons(bool, bool, bool, bool);
     void on_themSachButton_clicked();
+    void on_hopThuButton_clicked();
 };
 
 

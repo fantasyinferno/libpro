@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1133</width>
-    <height>784</height>
+    <width>1423</width>
+    <height>957</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -120,6 +126,13 @@ color: white;
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
+               <widget class="QPushButton" name="hopThuButton">
+                <property name="text">
+                 <string>Hộp thư</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="dangXuatButton">
                 <property name="autoFillBackground">
                  <bool>false</bool>
@@ -196,8 +209,8 @@ color: white;
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1109</width>
-           <height>524</height>
+           <width>1399</width>
+           <height>697</height>
           </rect>
          </property>
          <attribute name="icon">
@@ -670,7 +683,7 @@ color: black;</string>
            <x>0</x>
            <y>0</y>
            <width>1109</width>
-           <height>524</height>
+           <height>757</height>
           </rect>
          </property>
          <attribute name="icon">
@@ -852,7 +865,7 @@ color: black;</string>
            <x>0</x>
            <y>0</y>
            <width>1109</width>
-           <height>524</height>
+           <height>757</height>
           </rect>
          </property>
          <attribute name="icon">
@@ -877,7 +890,7 @@ color: black;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1133</width>
+     <width>1423</width>
      <height>26</height>
     </rect>
    </property>

@@ -44,6 +44,24 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::UpDownArrows</enum>
+           </property>
+           <property name="specialValueText">
+            <string/>
+           </property>
+           <property name="showGroupSeparator" stdset="0">
+            <bool>false</bool>
+           </property>
+           <property name="suffix">
+            <string> VNĐ</string>
+           </property>
+           <property name="maximum">
+            <number>3000000</number>
+           </property>
+           <property name="singleStep">
+            <number>1000</number>
+           </property>
           </widget>
          </item>
         </layout>
