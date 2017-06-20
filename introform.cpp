@@ -11,6 +11,7 @@
 #include <QFileDialog>
 #include <QSqlError>
 #include <QBuffer>
+#include <QCryptographicHash>
 
 IntroForm::IntroForm(QWidget *parent, QSqlDatabase database) :
     QDialog(parent),
@@ -32,14 +33,15 @@ void IntroForm::on_pushButton_clicked()
 
     QString st;
     QSqlQuery query(0, db);
-    query.prepare("SELECT * FROM account WHERE account = :tdn");
+    query.prepare("SELECT account_id, password FROM account WHERE account = :tdn");
     query.bindValue(":tdn",tdn);
     query.exec();
 
-    if (!query.next())
-        QMessageBox::critical(this,"Account Name Error!","No Account Name found!");
-    else if (mk!=query.value("password").toString())
-        QMessageBox::critical(this,"Password Error!","Wrong Password!");
+    if (!query.next() || QCryptographicHash::hash(mk.toUtf8(), QCryptographicHash::Sha3_512) != query.value("password").toByteArray()) {
+        qDebug() << QCryptographicHash::hash(mk.toUtf8(), QCryptographicHash::Sha3_512);
+        qDebug() << query.value("password").toByteArray();
+        QMessageBox::warning(this,"Không đúng!","Tên đăng nhập hoặc mật khẩu không đúng.");
+    }
     else
     {
         int id = query.value("account_id").toInt();
@@ -98,7 +100,10 @@ void IntroForm::on_dangKyButton_clicked()
     ui->avatar->pixmap()->save(&inBuffer, "PNG");
     query.prepare("insert into account(account, password, status_id, fullname, identity_number, gender_id, birthdate, email, job, avatar) values(:tdn, :mk, :tt, :hvt, :cmnd, :gt, :ns, :em, :cv, :av);");
     query.bindValue(":tdn",ui->dk_tdn->text());
-    query.bindValue(":mk",ui->dk_mk->text());
+    QByteArray passwordByteArray = ui->dk_mk->text().toUtf8();
+    passwordByteArray = QCryptographicHash::hash(passwordByteArray, QCryptographicHash::Sha3_512);
+    qDebug() << passwordByteArray;
+    query.bindValue(":mk",passwordByteArray);
     query.bindValue(":tt",1);
     query.bindValue(":hvt",(ui->dk_hvt->text()!=""? ui->dk_hvt->text() : NULL));
     query.bindValue(":cmnd",(ui->dk_cmnd->text()!=""? ui->dk_cmnd->text() : NULL));
