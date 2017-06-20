@@ -7,6 +7,7 @@
 #include <QItemSelection>
 #include <QSqlRelationalTableModel>
 #include <QLabel>
+#include <QItemSelection>
 #include "information.h"
 #include "introform.h"
 #include "about.h"
@@ -83,7 +84,7 @@ private slots:
     void enableLibrarianButtons(bool, bool, bool, bool);
     void on_themSachButton_clicked();
     void on_hopThuButton_clicked();
-
+    void enableButtonsProperly(QItemSelection);
     // Kiểm tra vai trò (manager)
     void submitVt();
     void checkVt();
@@ -91,6 +92,8 @@ private slots:
     void on_xoaButton_clicked();
     void on_thanhTimKiem_2_returnPressed();
     void on_timKiemButton_2_clicked();
+    // Kiểm tra tin nhắn mới
+    void on_tinNhanMoi(int);
 };
 
 

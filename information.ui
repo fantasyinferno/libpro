@@ -194,7 +194,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="ip_cmnd"/>
+            <widget class="QLineEdit" name="ip_cmnd">
+             <property name="inputMethodHints">
+              <set>Qt::ImhDigitsOnly</set>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -306,7 +310,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="ip_em"/>
+            <widget class="QLineEdit" name="ip_em">
+             <property name="inputMethodHints">
+              <set>Qt::ImhEmailCharactersOnly</set>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
