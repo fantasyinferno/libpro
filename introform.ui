@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="tabBarAutoHide">
       <bool>true</bool>
@@ -29,15 +29,69 @@
       <attribute name="title">
        <string>Đăng nhập</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_23">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="minimumSize">
+              <size>
+               <width>16</width>
+               <height>16</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16</width>
+               <height>16</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resources.qrc">:/media/icons/madebyoliver/user-3.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QLineEdit" name="dn_tdn">
              <property name="placeholderText">
               <string>Tên đăng nhập</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <item>
+            <widget class="QLabel" name="label_11">
+             <property name="minimumSize">
+              <size>
+               <width>16</width>
+               <height>16</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16</width>
+               <height>16</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resources.qrc">:/media/icons/madebyoliver/lock.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -53,32 +107,32 @@
            </item>
           </layout>
          </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_21">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_21">
-           <item>
-            <spacer name="horizontalSpacer_20">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>208</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton">
-             <property name="text">
-              <string>Đăng nhập</string>
-             </property>
-             <property name="default">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <spacer name="horizontalSpacer_20">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>208</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton">
+           <property name="text">
+            <string>Đăng nhập</string>
+           </property>
+           <property name="default">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -119,6 +173,9 @@
                </item>
                <item>
                 <widget class="QLineEdit" name="dk_tdn">
+                 <property name="inputMethodHints">
+                  <set>Qt::ImhLowercaseOnly</set>
+                 </property>
                  <property name="placeholderText">
                   <string/>
                  </property>
@@ -211,7 +268,11 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QLineEdit" name="dk_em"/>
+                <widget class="QLineEdit" name="dk_em">
+                 <property name="inputMethodHints">
+                  <set>Qt::ImhEmailCharactersOnly</set>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -334,7 +395,11 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QLineEdit" name="dk_cmnd"/>
+                <widget class="QLineEdit" name="dk_cmnd">
+                 <property name="inputMethodHints">
+                  <set>Qt::ImhDigitsOnly</set>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>

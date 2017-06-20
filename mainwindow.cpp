@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
     /* */
     QObject::connect(this, SIGNAL(aboutTriggered()), about, SLOT(show()));
     QObject::connect(information, SIGNAL(rolesLoaded(QList<int>&)), this, SLOT(on_rolesLoaded(QList<int>&)));
+    QObject::connect(inbox, SIGNAL(tinNhanMoi(int)), this, SLOT(on_tinNhanMoi(int)));
     initializeGUILogic(database);
     user_id = 0;
     user = "";
@@ -80,7 +81,7 @@ void MainWindow::initializeDatabase(QSqlDatabase database = QSqlDatabase()) {
 
 void MainWindow::initializeTable()
 {
-    // Thiết lập model
+    // Thiết lập model (cho sách)
     model = new QSqlTableModel(this, db);
     model->setTable("book");
     model->select();
@@ -92,17 +93,15 @@ void MainWindow::initializeTable()
     model->setHeaderData(5, Qt::Horizontal, tr("Năm sản xuất"));
     model->setHeaderData(6, Qt::Horizontal, tr("Nội dung"));
     model->setHeaderData(7, Qt::Horizontal, tr("Trạng thái"));
-    // Thiết lập delegate
+    // Thiết lập delegate (cho sách)
     BookDelegate *bd = new BookDelegate(ui->danhMucSach);
-    // Thiết lập View
+    // Thiết lập View (cho sách)
     ui->danhMucSach->setModel(model);
     ui->danhMucSach->setItemDelegate(bd);
     ui->danhMucSach->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->danhMucSach->horizontalHeader()->setVisible(true);
-    ui->danhMucSach->setColumnWidth(1, 60);
-    ui->danhMucSach->setColumnWidth(2, 400);
-    ui->danhMucSach->setColumnWidth(3, 400);
     ui->danhMucSach->setColumnHidden(6, true);
+    ui->danhMucSach->resizeColumnsToContents();
     bookMapper = new QDataWidgetMapper(this);
     bookMapper->setModel(model);
     bookMapper->setItemDelegate(new BookDelegate(this));
@@ -114,8 +113,10 @@ void MainWindow::initializeTable()
     bookMapper->addMapping(ui->tacGia, model->fieldIndex("author"));
     bookMapper->addMapping(ui->namSanXuat, model->fieldIndex("year"));
     bookMapper->addMapping(ui->biaSach, model->fieldIndex("cover"));
-    connect(ui->danhMucSach->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), bookMapper, SLOT(setCurrentModelIndex(QModelIndex)));
-    connect(ui->danhMucSach->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), ui->hienThiSach, SLOT(show()));
+    bookMapper->addMapping(ui->tinhTrangSach, model->fieldIndex("status"), "currentIndex");
+    connect(ui->danhMucSach->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), bookMapper, SLOT(setCurrentModelIndex(QModelIndex)));
+    connect(ui->danhMucSach->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), ui->hienThiSach, SLOT(show()));
+    connect(ui->danhMucSach->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(enableButtonsProperly(QItemSelection)));
     ui->hienThiSach->hide();
 }
 void MainWindow::initializeQuotes() {
@@ -175,7 +176,6 @@ void MainWindow::on_dangXuatButton_clicked()
     if (rolesList.contains(2)) {
         // Làm ngược lại với on_rolesLoaded()
         ui->toolBox->setItemEnabled(1, false);
-        ui->danhMucSach->setEditTriggers(QAbstractItemView::NoEditTriggers);
         ui->danhMucSach->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->thayDoiSachButton->hide();
         ui->themSachButton->hide();
@@ -231,7 +231,6 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         // Có thể sửa sách
         ui->thayDoiSachButton->show();
         ui->themSachButton->show();
-
         // Có thể chấp thuận yêu cầu sách
         requestBookModel = new QSqlRelationalTableModel(this, db);
         requestBookModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
@@ -249,17 +248,14 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         requestBookModel->setHeaderData(bookStatusIdIdx, Qt::Horizontal, tr("Trạng thái"));
         requestBookModel->select();
         ui->muonSachTable->setModel(requestBookModel);
-        ui->muonSachTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        ui->muonSachTable->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->muonSachTable->setColumnHidden(requestBookModel->fieldIndex("account_book_id"), true);
+        ui->muonSachTable->resizeColumnsToContents();
         ui->dangMuonTable->setModel(requestBookModel);
-        ui->dangMuonTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        ui->dangMuonTable->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->dangMuonTable->setColumnHidden(requestBookModel->fieldIndex("account_book_id"), true);
+        ui->dangMuonTable->resizeColumnsToContents();
         ui->matSachTable->setModel(requestBookModel);
-        ui->matSachTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        ui->matSachTable->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->matSachTable->setColumnHidden(requestBookModel->fieldIndex("account_book_id"), true);
+        ui->matSachTable->resizeColumnsToContents();
         on_tabWidget_currentChanged(ui->tabWidget->currentIndex());
     }
     if (rolesList.contains(3)) {
@@ -295,18 +291,18 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         ui->danhSachThanhVien->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->danhSachThanhVien->setItemDelegate(new AccountDelegate(this));
         ui->danhSachThanhVien->horizontalHeader()->setVisible(true);
-        ui->danhSachThanhVien->setColumnWidth(0, 30);
-        ui->danhSachThanhVien->setColumnWidth(1, 150);
-        ui->danhSachThanhVien->setColumnWidth(2, 120);
-        ui->danhSachThanhVien->setColumnWidth(3, 80);
-        ui->danhSachThanhVien->setColumnWidth(4, 150);
-        ui->danhSachThanhVien->setColumnWidth(5, 100);
-        ui->danhSachThanhVien->setColumnWidth(6, 80);
-        ui->danhSachThanhVien->setColumnWidth(7, 100);
-        ui->danhSachThanhVien->setColumnWidth(8, 150);
-        ui->danhSachThanhVien->setColumnWidth(9, 150);
+//        ui->danhSachThanhVien->setColumnWidth(0, 30);
+//        ui->danhSachThanhVien->setColumnWidth(1, 150);
+//        ui->danhSachThanhVien->setColumnWidth(2, 120);
+//        ui->danhSachThanhVien->setColumnWidth(3, 80);
+//        ui->danhSachThanhVien->setColumnWidth(4, 150);
+//        ui->danhSachThanhVien->setColumnWidth(5, 100);
+//        ui->danhSachThanhVien->setColumnWidth(6, 80);
+//        ui->danhSachThanhVien->setColumnWidth(7, 100);
+//        ui->danhSachThanhVien->setColumnWidth(8, 150);
+//        ui->danhSachThanhVien->setColumnWidth(9, 150);
         ui->danhSachThanhVien->setColumnHidden(2, true);
-        QObject::connect(ui->danhSachThanhVien->selectionModel(), SIGNAL(selectionChanged( const QItemSelection &, const QItemSelection &)), SLOT(on_selectionChanged(const QItemSelection &, const QItemSelection &)));
+        ui->danhSachThanhVien->resizeColumnsToContents();
         memberMapper = new QDataWidgetMapper(this);
         memberMapper->setModel(memberModel);
         memberMapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
@@ -343,6 +339,7 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
 void MainWindow::on_muonButton_clicked()
 {
     if (user_id != 0) {
+        // Lấy danh sách đã chọn
         QModelIndexList list = ui->danhMucSach->selectionModel()->selectedRows(0);
         if (!list.isEmpty()) {
             QSqlQuery query(0, db);
@@ -508,6 +505,7 @@ void MainWindow::on_thayDoiSachButton_clicked()
     ui->theLoai->setReadOnly(false);
     ui->tuaDe->setReadOnly(false);
     ui->noiDungSach->setReadOnly(false);
+    ui->tinhTrangSach->setEnabled(true);
     ui->thayDoiSachButton->hide();
     ui->chapNhanSachButton->show();
     ui->huySachButton->show();
@@ -515,13 +513,18 @@ void MainWindow::on_thayDoiSachButton_clicked()
 
 void MainWindow::on_chapNhanSachButton_clicked()
 {
+    // Submit dữ liệu vào model
     bookMapper->submit();
+    bookMapper->toNext();
+    // Model update view
+    model->select();
     ui->maSach->setReadOnly(true);
     ui->namSanXuat->setReadOnly(true);
     ui->tacGia->setReadOnly(true);
     ui->theLoai->setReadOnly(true);
     ui->tuaDe->setReadOnly(true);
     ui->noiDungSach->setReadOnly(true);
+    ui->tinhTrangSach->setEnabled(false);
     ui->thayDoiSachButton->show();
     ui->chapNhanSachButton->hide();
     ui->huySachButton->hide();
@@ -559,12 +562,36 @@ void MainWindow::on_themSachButton_clicked()
 
 void MainWindow::on_hopThuButton_clicked()
 {
+    // Reset lại text trên hộp thư nếu có tin nhắn mới
+    if (ui->hopThuButton->text() != "Hộp thư") {
+        ui->hopThuButton->setText("Hộp thư");
+    }
     emit inboxRequest();
+}
+
+void MainWindow::enableButtonsProperly(QItemSelection selected)
+{
+    if (!selected.indexes().isEmpty()) {
+        ui->thayDoiSachButton->setEnabled(true);
+        ui->muonButton->setEnabled(true);
+    } else {
+        ui->thayDoiSachButton->setEnabled(false);
+        ui->muonButton->setEnabled(false);
+    }
 }
 
 void MainWindow::on_timKiemButton_2_clicked()
 {
     on_thanhTimKiem_2_returnPressed();
+}
+
+void MainWindow::on_tinNhanMoi(int numMessages)
+{
+    if (numMessages < 1) {
+        ui->hopThuButton->setText("Hộp thư");
+    } else {
+        ui->hopThuButton->setText(QString("Hộp thư (%1)").arg(numMessages));
+    }
 }
 
 void MainWindow::on_thanhTimKiem_2_returnPressed()
