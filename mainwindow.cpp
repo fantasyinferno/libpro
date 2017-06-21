@@ -291,16 +291,6 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
         ui->danhSachThanhVien->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->danhSachThanhVien->setItemDelegate(new AccountDelegate(this));
         ui->danhSachThanhVien->horizontalHeader()->setVisible(true);
-//        ui->danhSachThanhVien->setColumnWidth(0, 30);
-//        ui->danhSachThanhVien->setColumnWidth(1, 150);
-//        ui->danhSachThanhVien->setColumnWidth(2, 120);
-//        ui->danhSachThanhVien->setColumnWidth(3, 80);
-//        ui->danhSachThanhVien->setColumnWidth(4, 150);
-//        ui->danhSachThanhVien->setColumnWidth(5, 100);
-//        ui->danhSachThanhVien->setColumnWidth(6, 80);
-//        ui->danhSachThanhVien->setColumnWidth(7, 100);
-//        ui->danhSachThanhVien->setColumnWidth(8, 150);
-//        ui->danhSachThanhVien->setColumnWidth(9, 150);
         ui->danhSachThanhVien->setColumnHidden(2, true);
         ui->danhSachThanhVien->resizeColumnsToContents();
         memberMapper = new QDataWidgetMapper(this);
@@ -727,12 +717,10 @@ void MainWindow::on_thayDoiButton_clicked()
     query.prepare("update account set status_id=:tt where account_id=:id");
     query.bindValue(":tt",(ui->tinhTrang->currentText()=="Hoạt động")? "1" : "2");
     query.bindValue(":id",ui->id->text());
-    qDebug()<<query.exec();
 
     query.prepare("update account set gender_id=:gt where account_id=:id");
     query.bindValue(":gt",ui->gioiTinh->currentText()=="Nam"? "1" : "2");
     query.bindValue(":id",ui->id->text());
-    qDebug()<<query.exec();
 }
 
 void MainWindow::checkVt() {
