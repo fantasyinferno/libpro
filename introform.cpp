@@ -12,7 +12,8 @@
 #include <QSqlError>
 #include <QBuffer>
 #include <QCryptographicHash>
-#include <QPixmap>
+#include <QIntValidator>
+#include <QRegExpValidator>
 
 IntroForm::IntroForm(QWidget *parent, QSqlDatabase database) :
     QDialog(parent),
@@ -21,6 +22,19 @@ IntroForm::IntroForm(QWidget *parent, QSqlDatabase database) :
     ui->setupUi(this);
     this->setModal(true);
     db = database;
+    QRegExp tdnReg("^\\w{5,25}$");
+//    QRegExp mkReg("");
+    QRegExp emReg("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}\\b");
+    QRegExp hvtReg("^([^0-9]*)$");
+//    QRegExp cvReg("");
+    QRegExp cmndReg("^[0-9]{10}$");
+    ui->dk_tdn->setValidator(new QRegExpValidator(tdnReg, this));
+//    ui->dk_mk->setValidator(mkReg);
+    ui->dk_em->setValidator(new QRegExpValidator(emReg, this));
+    ui->dk_hvt->setValidator(new QRegExpValidator(hvtReg, this));
+//    ui->dk_cv->setValidator(cvReg);
+    ui->dk_cmnd->setValidator(new QRegExpValidator(cmndReg, this));
+
 }
 
 IntroForm::~IntroForm()
