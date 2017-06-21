@@ -14,6 +14,8 @@
 #include <QBuffer>
 #include <QSqlRelation>
 #include <QList>
+#include <QRegExp>
+#include <QRegExpValidator>
 #include "accountdelegate.h"
 
 Information::Information(QWidget *parent, QSqlDatabase database) :
@@ -23,6 +25,18 @@ Information::Information(QWidget *parent, QSqlDatabase database) :
     ui->setupUi(this);
     this->setModal(true);
     db = database;
+
+    QRegExp mkReg(".{10,}");
+    QRegExp emReg("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}\\b");
+    QRegExp hvtReg("^([^0-9]+)$");
+    QRegExp cvReg(".+");
+    QRegExp cmndReg("^([0-9]{9}|[0-9]{12})$");
+    ui->ip_mk->setValidator(new QRegExpValidator(mkReg));
+    ui->ip_em->setValidator(new QRegExpValidator(emReg, this));
+    ui->ip_hvt->setValidator(new QRegExpValidator(hvtReg, this));
+    ui->ip_nn->setValidator(new QRegExpValidator(cvReg));
+    ui->ip_cmnd->setValidator(new QRegExpValidator(cmndReg, this));
+
     enableEdit(false);
     // Model cho thông tin cá nhân
     model = new QSqlRelationalTableModel(this, db);
@@ -189,9 +203,29 @@ int Information::getBorrowedNumOfBook()
 
 void Information::on_hoanTatButton_clicked()
 {
-    enableEdit(false);
-    mapper->submit();
-    submitVt();
+    QString errorMessage;
+    if (!ui->ip_mk->hasAcceptableInput()) {
+        errorMessage += "Mật khẩu phải có ít nhất 10 ký tự";
+    }
+    if (!ui->ip_hvt->hasAcceptableInput()) {
+        errorMessage += "Họ và tên không hợp lệ!\n";
+    }
+    if (!ui->ip_nn->hasAcceptableInput()) {
+        errorMessage += "Công việc không hợp lệ!\n";
+    }
+    if (!ui->ip_em->hasAcceptableInput()) {
+        errorMessage += "Email không hợp lệ!\n";
+    }
+    if (!ui->ip_cmnd->hasAcceptableInput()) {
+        errorMessage += "CMND không hợp lệ\n";
+    }
+    if (errorMessage.isEmpty()) {
+        enableEdit(false);
+        mapper->submit();
+        submitVt();
+    } else {
+        QMessageBox::warning(this, "Không hợp lệ", errorMessage);
+    }
 }
 
 void Information::enableEdit(bool enabled = true) {

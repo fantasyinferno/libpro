@@ -76,6 +76,8 @@ Inbox::Inbox(QWidget *parent, QSqlDatabase database) :
     ui->nguoiNhan->setModel(model->relationModel(receiverIdx));
     ui->nguoiNhan->setModelColumn(1);
     ui->hienThiTinNhan->hide();
+
+
 }
 
 bool Inbox::sendMessage(QString username, QString title, QString text)

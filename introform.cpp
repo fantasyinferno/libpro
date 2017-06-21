@@ -22,17 +22,17 @@ IntroForm::IntroForm(QWidget *parent, QSqlDatabase database) :
     ui->setupUi(this);
     this->setModal(true);
     db = database;
-    QRegExp tdnReg("^\\w{5,25}$");
-//    QRegExp mkReg("");
+    QRegExp tdnReg("^[a-zA-Z-_\.0-9]{5,25}$");
+    QRegExp mkReg(".{10,}");
     QRegExp emReg("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}\\b");
-    QRegExp hvtReg("^([^0-9]*)$");
-//    QRegExp cvReg("");
-    QRegExp cmndReg("^[0-9]{10}$");
+    QRegExp hvtReg("^([^0-9]+)$");
+    QRegExp cvReg(".+");
+    QRegExp cmndReg("^([0-9]{9}|[0-9]{12})$");
     ui->dk_tdn->setValidator(new QRegExpValidator(tdnReg, this));
-//    ui->dk_mk->setValidator(mkReg);
+    ui->dk_mk->setValidator(new QRegExpValidator(mkReg));
     ui->dk_em->setValidator(new QRegExpValidator(emReg, this));
     ui->dk_hvt->setValidator(new QRegExpValidator(hvtReg, this));
-//    ui->dk_cv->setValidator(cvReg);
+    ui->dk_cv->setValidator(new QRegExpValidator(cvReg));
     ui->dk_cmnd->setValidator(new QRegExpValidator(cmndReg, this));
 
 }
@@ -78,33 +78,46 @@ void IntroForm::setTab(int i)
 void IntroForm::on_dangKyButton_clicked()
 {
 //    query("select max(user_id) as user_id from user;");
-
-    if (ui->dk_tdn->text()=="")
-    {
-        QMessageBox::critical(this,"Tên đăng nhập","Tên đăng nhập trống");
-        return;
-    }
-
     QSqlQuery query2;
     query2.prepare("select password from account where account = :tdn");
     query2.bindValue(":tdn",ui->dk_tdn->text());
     query2.exec();
-
+    QString errorMessage;
     if (query2.next())
     {
-        QMessageBox::critical(this,"Tên đăng nhập!","Tên đăng nhập đã tồn tại");
-        return;
+        errorMessage += "Tên đăng nhập đã tồn tại\n";
     }
-
-    if (ui->dk_mk->text()=="")
-    {
-        QMessageBox::critical(this,"Mật khẩu","Mật khẩu trống");
-        return;
+//    if (ui->dk_tdn->text().isEmpty() || ui->dk_cv->text().isEmpty() || ui->dk_mk->text().isEmpty() ||
+//            ui->dk_cmnd->text().isEmpty() || ui->dk_em->text().isEmpty() ||
+//            !(ui->dk_gt_nam->isChecked() || ui->dk_gt_nu->isChecked()))
+//    {
+//        QMessageBox::warning(this,"Nhập lại thông tin","Vui lòng điền đẩy đủ các trường thông tin!");
+//        return;
+//    }
+    if (!ui->dk_tdn->hasAcceptableInput()) {
+        errorMessage += "Tên đăng nhập không hợp lệ (tên đăng nhập chỉ gồm các ký tự bảng chữ cái, số và các ký tự ., _, - và có độ dài từ 5 đến 25 ký tự)\n";
     }
-
+    if (!ui->dk_mk->hasAcceptableInput()) {
+        errorMessage += "Mật khẩu phải có ít nhất 10 ký tự";
+    }
+    if (!ui->dk_hvt->hasAcceptableInput()) {
+        errorMessage += "Họ và tên không hợp lệ!\n";
+    }
+    if (!ui->dk_cv->hasAcceptableInput()) {
+        errorMessage += "Công việc không hợp lệ!\n";
+    }
+    if (!ui->dk_em->hasAcceptableInput()) {
+        errorMessage += "Email không hợp lệ!\n";
+    }
+    if (!ui->dk_cmnd->hasAcceptableInput()) {
+        errorMessage += "CMND không hợp lệ";
+    }
     if (ui->dk_mk->text()!=ui->dk_nlmk->text())
     {
-        QMessageBox::critical(this,"Mật khẩu","Nhập lại mật khẩu không đúng");
+        errorMessage += "Mật khẩu nhập lại không đúng!\n";
+    }
+    if (!errorMessage.isEmpty()) {
+        QMessageBox::warning(this, "Không hợp lệ!", errorMessage);
         return;
     }
     QSqlQuery query(0,db);

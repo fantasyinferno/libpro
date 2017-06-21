@@ -50,7 +50,17 @@ MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
     initializeGUILogic(database);
     user_id = 0;
     user = "";
-
+    // Đặt giới hạn lên các trường thông tin ở quần quản lý người dùng
+    QRegExp mkReg(".{10,}");
+    QRegExp emReg("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}\\b");
+    QRegExp hvtReg("^([^0-9]+)$");
+    QRegExp cvReg(".+");
+    QRegExp cmndReg("^([0-9]{9}|[0-9]{12})$");
+    ui->matKhau->setValidator(new QRegExpValidator(mkReg));
+    ui->email->setValidator(new QRegExpValidator(emReg, this));
+    ui->hoVaTen->setValidator(new QRegExpValidator(hvtReg, this));
+    ui->congViec->setValidator(new QRegExpValidator(cvReg));
+    ui->CMND->setValidator(new QRegExpValidator(cmndReg, this));
 }
 
 MainWindow::~MainWindow()
@@ -186,8 +196,6 @@ void MainWindow::on_dangXuatButton_clicked()
     if (rolesList.contains(3)) {
         delete memberMapper;
         delete memberModel;
-        ui->gioiTinh->clear();
-        ui->tinhTrang->clear();
     }
     rolesList.clear();
     ui->toolBox->setItemEnabled(2, false);
@@ -670,8 +678,10 @@ void MainWindow::on_xoaButton_clicked()
     query.prepare("delete from account where account_id= :id");
     query.bindValue(":id", ui->id->text());
     bool ms=query.exec();
-    if (ms)
+    if (ms) {
         QMessageBox::about(this,"Xóa tài khoản","Xóa tài khoản thành công!");
+        memberModel->select();
+    }
     else
         QMessageBox::about(this,"Xóa tài khoản","Xóa tài khoản thất bại!");
 }
@@ -728,20 +738,32 @@ void MainWindow::submitVt()
 
 void MainWindow::on_thayDoiButton_clicked()
 {
+
+    QString errorMessage;
+    if (!ui->matKhau->hasAcceptableInput()) {
+        errorMessage += "Mật khẩu phải có ít nhất 10 ký tự";
+    }
+    if (!ui->congViec->hasAcceptableInput()) {
+        errorMessage += "Họ và tên không hợp lệ!\n";
+    }
+    if (!ui->congViec->hasAcceptableInput()) {
+        errorMessage += "Công việc không hợp lệ!\n";
+    }
+    if (!ui->email->hasAcceptableInput()) {
+        errorMessage += "Email không hợp lệ!\n";
+    }
+    if (!ui->CMND->hasAcceptableInput()) {
+        errorMessage += "CMND không hợp lệ";
+    }
+    if (!errorMessage.isEmpty()) {
+        QMessageBox::warning(this, "Không hợp lệ", errorMessage);
+        return;
+    }
+
     memberMapper->submit();
     submitVt();
 
     QSqlQuery query(0,db);
-    qDebug()<<ui->tinhTrang->currentText();
-    qDebug()<<ui->id->text();
-
-    query.prepare("update account set status_id=:tt where account_id=:id");
-    query.bindValue(":tt",(ui->tinhTrang->currentText()=="Hoạt động")? "1" : "2");
-    query.bindValue(":id",ui->id->text());
-
-    query.prepare("update account set gender_id=:gt where account_id=:id");
-    query.bindValue(":gt",ui->gioiTinh->currentText()=="Nam"? "1" : "2");
-    query.bindValue(":id",ui->id->text());
 }
 
 void MainWindow::checkVt() {
