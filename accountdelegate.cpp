@@ -4,6 +4,9 @@
 #include <QPixmap>
 #include <QBuffer>
 #include <QPainter>
+#include <QCryptographicHash>
+#include <QLineEdit>
+#include <QDebug>
 AccountDelegate::AccountDelegate(QWidget* parent): QSqlRelationalDelegate(parent)
 {
 
@@ -29,6 +32,7 @@ void AccountDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
 
 void AccountDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
     if (index.column() != 10) {
+        // Cột 10 là cột avatar. Cột thứ 2 là cột password
         QSqlRelationalDelegate::setEditorData(editor, index);
         return;
     }
@@ -42,7 +46,8 @@ void AccountDelegate::setEditorData(QWidget *editor, const QModelIndex &index) c
     }
 }
 void AccountDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const {
-    if (index.column() != 10) {
+    if (index.column() != 10 && index.column() != 2) {
+        // Cột 10 là cột avatar. Cột thứ 2 là cột password
         QSqlRelationalDelegate::setModelData(editor, model, index);
         return;
     }
@@ -51,7 +56,15 @@ void AccountDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, c
         QBuffer inBuffer;
         inBuffer.open(QIODevice::WriteOnly);
         if (label->pixmap()->save(&inBuffer, "PNG")) {
-            model->setData(index, inBuffer.data(), Qt::EditRole);
+            model->setData(index, inBuffer.data());
+        }
+    }
+    QLineEdit *lineEdit = qobject_cast<QLineEdit*>(editor);
+    if (lineEdit) {
+        QString unencrypted = lineEdit->text();
+        if (unencrypted != index.data().toString()) {
+            QByteArray encrypted = QCryptographicHash::hash(unencrypted.toUtf8(), QCryptographicHash::Sha3_512);
+            model->setData(index, encrypted);
         }
     }
 }
