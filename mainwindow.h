@@ -50,7 +50,6 @@ private:
 
 
 signals:
-    void updateMyBooks(const QModelIndexList&);
     void formRequest(int);
     void dangXuat();
     void informationRequest();

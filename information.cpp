@@ -180,7 +180,7 @@ void Information::submitAv() {
 
 int Information::getBorrowedNumOfBook()
 {
-    bookModel->setFilter("book_status = 'Đang mượn' OR book_status = 'Chờ duyệt'");
+    bookModel->setFilter("(book_status = 'Đang mượn' OR book_status = 'Chờ duyệt') AND account_id = " + user_id);
     return bookModel->rowCount();
 }
 
@@ -249,22 +249,6 @@ void Information::on_huyButton_clicked()
     enableEdit(false);
     mapper->revert();
 }
-void Information::on_updateMyBooks(const QModelIndexList& selectedList) {
-    QSqlQuery query(0, db);
-    query.prepare("INSERT INTO account_book(account_id, book_id, start_date, due_date) VALUES(:account_id, :book_id, :start_date, :due_date)");
-    query.bindValue(":account_id", user_id);
-    QDate today = QDate::currentDate();
-    for (int i = 0; i != selectedList.size(); ++i) {
-        QString book_id = selectedList[i].data().toString();
-        query.bindValue(":book_id", book_id);
-        query.bindValue(":start_date", today);
-        query.bindValue(":due_date", today.addDays(15));
-        if (!query.exec())
-            qDebug() << query.lastError();
-    }
-    bookModel->select();
-}
-
 void Information::on_avatarButton_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Image Files (*.png *.jpg *.bmp)"));
@@ -315,4 +299,5 @@ void Information::on_tabWidget_currentChanged(int index)
     } else {
         bookModel->setFilter(QString("(book_status = 'Đã trả' OR book_status = 'Bị mất') AND account_id = %1").arg(user_id));
     }
+    bookModel->select();
 }

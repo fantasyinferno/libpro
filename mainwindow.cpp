@@ -37,7 +37,6 @@ MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
     QObject::connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), information, SLOT(on_dangNhapThanhCong(int, QString)));
     QObject::connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), inbox, SLOT(on_dangNhapThanhCong(int,QString)));
     QObject::connect(information, SIGNAL(avatarChanged(const QPixmap*)), this, SLOT(on_avatarChanged(const QPixmap*)));
-    QObject::connect(this, SIGNAL(updateMyBooks(const QModelIndexList&)), information, SLOT(on_updateMyBooks(const QModelIndexList&)));
     /* TODO: Thay thế 5 cái này bằng slots của buttons */
     QObject::connect(this, SIGNAL(dangXuat()), information, SLOT(on_dangXuat()));
     QObject::connect(this, SIGNAL(dangXuat()), inbox, SLOT(on_dangXuat()));
@@ -341,6 +340,7 @@ void MainWindow::on_muonButton_clicked()
         for (QModelIndex &index: list) {
             if (!index.sibling(index.row(), model->fieldIndex("status")).data().toInt()) {
                 QMessageBox::warning(this, "Mượn sách", QString("Một số sách đã chọn không khả dụng!"));
+                return;
             }
         }
         bool ok = true;

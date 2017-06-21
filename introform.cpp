@@ -12,6 +12,7 @@
 #include <QSqlError>
 #include <QBuffer>
 #include <QCryptographicHash>
+#include <QPixmap>
 
 IntroForm::IntroForm(QWidget *parent, QSqlDatabase database) :
     QDialog(parent),
@@ -38,7 +39,7 @@ void IntroForm::on_pushButton_clicked()
     query.exec();
     if (!query.next() || QCryptographicHash::hash(mk.toUtf8(), QCryptographicHash::Sha3_512) != query.value("password").toByteArray()) {
         QMessageBox::warning(this,"Không đúng!","Tên đăng nhập hoặc mật khẩu không đúng.");
-    } else if (query.value("status") == 2) {
+    } else if (query.value("status_id") == 2) {
         QMessageBox::warning(this, "Bị khóa!", "Tài khoản này đã bị khóa");
     }
     else
@@ -100,9 +101,7 @@ void IntroForm::on_dangKyButton_clicked()
     query.prepare("insert into account(account, password, status_id, fullname, identity_number, gender_id, birthdate, email, job, avatar) values(:tdn, :mk, :tt, :hvt, :cmnd, :gt, :ns, :em, :cv, :av);");
     query.bindValue(":tdn",ui->dk_tdn->text());
     QByteArray passwordByteArray = ui->dk_mk->text().toUtf8();
-    qDebug() << passwordByteArray;
     passwordByteArray = QCryptographicHash::hash(passwordByteArray, QCryptographicHash::Sha3_512);
-    qDebug() << passwordByteArray;
     query.bindValue(":mk",passwordByteArray);
     query.bindValue(":tt",1);
     query.bindValue(":hvt",(ui->dk_hvt->text()!=""? ui->dk_hvt->text() : NULL));
@@ -132,6 +131,21 @@ void IntroForm::on_dangKyButton_clicked()
     }
     if(ok){
         QMessageBox::about(this,"Đăng ký thành công","Đăng ký tài khoản thành công");
+        // Reset form đăng ký
+        ui->dk_cmnd->clear();
+        ui->dk_cv->clear();
+        ui->dk_em->clear();
+        ui->dk_gt_nam->setChecked(false);
+        ui->dk_gt_nu->setChecked(false);
+        ui->dk_hvt->clear();
+        ui->dk_mk->clear();
+        ui->dk_nlmk->clear();
+        ui->dk_ns->clear();
+        ui->dk_tdn->clear();
+        ui->dk_vt_librarian->setChecked(false);
+        ui->dk_vt_manager->setChecked(false);
+        ui->dk_vt_reader->setChecked(false);
+        ui->avatar->setPixmap(QPixmap(":media/images/default.png"));
         this->close();
         emit dangNhapThanhCong(id, ui->dk_tdn->text());
     }
@@ -155,10 +169,4 @@ void IntroForm::on_avatarButton_clicked()
 void IntroForm::on_formRequest(int tab) {
     this->setTab(tab);
     this->show();
-}
-
-void IntroForm::on_iAmYourParent(QWidget *widget)
-{
-    this->setParent(widget);
-    this->setWindowFlags(Qt::Dialog);
 }

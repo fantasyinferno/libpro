@@ -31,7 +31,6 @@ private slots:
     void on_hoanTatButton_clicked();
     void on_thayDoiButton_clicked();
     void on_dangNhapThanhCong(int, QString);
-    void on_updateMyBooks(const QModelIndexList& selectedList);
     void on_huyButton_clicked();
     void on_avatarButton_clicked();
     void on_currentIndexChanged(int);

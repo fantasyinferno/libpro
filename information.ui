@@ -145,7 +145,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="ip_tt"/>
+            <widget class="QComboBox" name="ip_tt">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -346,6 +350,9 @@
             <layout class="QHBoxLayout" name="vt_form">
              <item>
               <widget class="QCheckBox" name="ip_vt_reader">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Reader</string>
                </property>
@@ -353,6 +360,9 @@
              </item>
              <item>
               <widget class="QCheckBox" name="ip_vt_manager">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Manager</string>
                </property>
@@ -360,6 +370,9 @@
              </item>
              <item>
               <widget class="QCheckBox" name="ip_vt_librarian">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Librarian</string>
                </property>
