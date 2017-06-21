@@ -364,6 +364,12 @@
                  <property name="text">
                   <string>Nam</string>
                  </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                 <property name="autoRepeat">
+                  <bool>false</bool>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -465,13 +471,22 @@
           <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
             <widget class="QCheckBox" name="dk_vt_reader">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Người đọc</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QCheckBox" name="dk_vt_librarian">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Thủ thư</string>
              </property>
@@ -479,6 +494,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="dk_vt_manager">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Quản lý</string>
              </property>

@@ -215,7 +215,7 @@ color: white;
 }</string>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="sachPage">
          <property name="enabled">
@@ -741,7 +741,7 @@ color: black;</string>
               <item>
                <widget class="QTabWidget" name="tabWidget">
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="muonSach">
                  <attribute name="title">
@@ -1005,6 +1005,9 @@ color: black;</string>
                     </item>
                     <item row="0" column="1">
                      <widget class="QLineEdit" name="id">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1031,6 +1034,9 @@ color: black;</string>
                     </item>
                     <item row="1" column="1">
                      <widget class="QLineEdit" name="tenDangNhap">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1485,7 +1491,23 @@ color: red;</string>
                 </widget>
                </item>
                <item>
-                <widget class="QComboBox" name="combo_tinhtrang"/>
+                <widget class="QComboBox" name="combo_tinhtrang">
+                 <item>
+                  <property name="text">
+                   <string>Tất cả</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Hoạt động</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Bị khóa</string>
+                  </property>
+                 </item>
+                </widget>
                </item>
                <item>
                 <widget class="QLabel" name="label_13">
@@ -1495,7 +1517,23 @@ color: red;</string>
                 </widget>
                </item>
                <item>
-                <widget class="QComboBox" name="combo_gioitinh"/>
+                <widget class="QComboBox" name="combo_gioitinh">
+                 <item>
+                  <property name="text">
+                   <string>Tất cả</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Nam</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Nữ</string>
+                  </property>
+                 </item>
+                </widget>
                </item>
               </layout>
              </widget>

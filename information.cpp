@@ -14,6 +14,8 @@
 #include <QBuffer>
 #include <QSqlRelation>
 #include <QList>
+#include <QRegExp>
+#include <QRegExpValidator>
 #include "accountdelegate.h"
 
 Information::Information(QWidget *parent, QSqlDatabase database) :
@@ -23,6 +25,18 @@ Information::Information(QWidget *parent, QSqlDatabase database) :
     ui->setupUi(this);
     this->setModal(true);
     db = database;
+
+    QRegExp mkReg(".{10,}");
+    QRegExp emReg("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}\\b");
+    QRegExp hvtReg("^([^0-9]+)$");
+    QRegExp cvReg(".+");
+    QRegExp cmndReg("^([0-9]{9}|[0-9]{12})$");
+    ui->ip_mk->setValidator(new QRegExpValidator(mkReg));
+    ui->ip_em->setValidator(new QRegExpValidator(emReg, this));
+    ui->ip_hvt->setValidator(new QRegExpValidator(hvtReg, this));
+    ui->ip_nn->setValidator(new QRegExpValidator(cvReg));
+    ui->ip_cmnd->setValidator(new QRegExpValidator(cmndReg, this));
+
     enableEdit(false);
     // Model cho thông tin cá nhân
     model = new QSqlRelationalTableModel(this, db);
@@ -178,14 +192,40 @@ void Information::submitAv() {
     }
 }
 
+int Information::getBorrowedNumOfBook()
+{
+    bookModel->setFilter("(book_status = 'Đang mượn' OR book_status = 'Chờ duyệt') AND account_id = " + user_id);
+    return bookModel->rowCount();
+}
+
 //*********************************
 
 
 void Information::on_hoanTatButton_clicked()
 {
-    enableEdit(false);
-    mapper->submit();
-    submitVt();
+    QString errorMessage;
+    if (!ui->ip_mk->hasAcceptableInput()) {
+        errorMessage += "Mật khẩu phải có ít nhất 10 ký tự";
+    }
+    if (!ui->ip_hvt->hasAcceptableInput()) {
+        errorMessage += "Họ và tên không hợp lệ!\n";
+    }
+    if (!ui->ip_nn->hasAcceptableInput()) {
+        errorMessage += "Công việc không hợp lệ!\n";
+    }
+    if (!ui->ip_em->hasAcceptableInput()) {
+        errorMessage += "Email không hợp lệ!\n";
+    }
+    if (!ui->ip_cmnd->hasAcceptableInput()) {
+        errorMessage += "CMND không hợp lệ\n";
+    }
+    if (errorMessage.isEmpty()) {
+        enableEdit(false);
+        mapper->submit();
+        submitVt();
+    } else {
+        QMessageBox::warning(this, "Không hợp lệ", errorMessage);
+    }
 }
 
 void Information::enableEdit(bool enabled = true) {
@@ -243,22 +283,6 @@ void Information::on_huyButton_clicked()
     enableEdit(false);
     mapper->revert();
 }
-void Information::on_updateMyBooks(const QModelIndexList& selectedList) {
-    QSqlQuery query(0, db);
-    query.prepare("INSERT INTO account_book(account_id, book_id, start_date, due_date) VALUES(:account_id, :book_id, :start_date, :due_date)");
-    query.bindValue(":account_id", user_id);
-    QDate today = QDate::currentDate();
-    for (int i = 0; i != selectedList.size(); ++i) {
-        QString book_id = selectedList[i].data().toString();
-        query.bindValue(":book_id", book_id);
-        query.bindValue(":start_date", today);
-        query.bindValue(":due_date", today.addDays(15));
-        if (!query.exec())
-            qDebug() << query.lastError();
-    }
-    bookModel->select();
-}
-
 void Information::on_avatarButton_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Image Files (*.png *.jpg *.bmp)"));
@@ -309,4 +333,5 @@ void Information::on_tabWidget_currentChanged(int index)
     } else {
         bookModel->setFilter(QString("(book_status = 'Đã trả' OR book_status = 'Bị mất') AND account_id = %1").arg(user_id));
     }
+    bookModel->select();
 }

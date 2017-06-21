@@ -1,0 +1,2 @@
+drop table if exists message;
+CREATE TABLE message(message_id INTEGER PRIMARY KEY, title VARCHAR(255), sender INTEGER, receiver INTEGER, content TEXT, send_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, is_read TINYINT(2));

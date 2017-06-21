@@ -37,7 +37,6 @@ MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
     QObject::connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), information, SLOT(on_dangNhapThanhCong(int, QString)));
     QObject::connect(introForm, SIGNAL(dangNhapThanhCong(int, QString)), inbox, SLOT(on_dangNhapThanhCong(int,QString)));
     QObject::connect(information, SIGNAL(avatarChanged(const QPixmap*)), this, SLOT(on_avatarChanged(const QPixmap*)));
-    QObject::connect(this, SIGNAL(updateMyBooks(const QModelIndexList&)), information, SLOT(on_updateMyBooks(const QModelIndexList&)));
     /* TODO: Thay thế 5 cái này bằng slots của buttons */
     QObject::connect(this, SIGNAL(dangXuat()), information, SLOT(on_dangXuat()));
     QObject::connect(this, SIGNAL(dangXuat()), inbox, SLOT(on_dangXuat()));
@@ -51,7 +50,17 @@ MainWindow::MainWindow(QWidget *parent, QSqlDatabase database) :
     initializeGUILogic(database);
     user_id = 0;
     user = "";
-
+    // Đặt giới hạn lên các trường thông tin ở quần quản lý người dùng
+    QRegExp mkReg(".{10,}");
+    QRegExp emReg("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}\\b");
+    QRegExp hvtReg("^([^0-9]+)$");
+    QRegExp cvReg(".+");
+    QRegExp cmndReg("^([0-9]{9}|[0-9]{12})$");
+    ui->matKhau->setValidator(new QRegExpValidator(mkReg));
+    ui->email->setValidator(new QRegExpValidator(emReg, this));
+    ui->hoVaTen->setValidator(new QRegExpValidator(hvtReg, this));
+    ui->congViec->setValidator(new QRegExpValidator(cvReg));
+    ui->CMND->setValidator(new QRegExpValidator(cmndReg, this));
 }
 
 MainWindow::~MainWindow()
@@ -115,8 +124,7 @@ void MainWindow::initializeTable()
     bookMapper->addMapping(ui->biaSach, model->fieldIndex("cover"));
     bookMapper->addMapping(ui->tinhTrangSach, model->fieldIndex("status"), "currentIndex");
     connect(ui->danhMucSach->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), bookMapper, SLOT(setCurrentModelIndex(QModelIndex)));
-    connect(ui->danhMucSach->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), ui->hienThiSach, SLOT(show()));
-    connect(ui->danhMucSach->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(enableButtonsProperly(QItemSelection)));
+    connect(ui->danhMucSach->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(enableButtonsProperly()));
     ui->hienThiSach->hide();
 }
 void MainWindow::initializeQuotes() {
@@ -185,6 +193,11 @@ void MainWindow::on_dangXuatButton_clicked()
         ui->matSachTable->setModel(0);
         delete requestBookModel;
     }
+    if (rolesList.contains(3)) {
+        delete memberMapper;
+        delete memberModel;
+    }
+    rolesList.clear();
     ui->toolBox->setItemEnabled(2, false);
     emit dangXuat();
 }
@@ -315,14 +328,6 @@ void MainWindow::on_rolesLoaded(QList<int>& list)
 
         QObject::connect(ui->danhSachThanhVien->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), memberMapper, SLOT(setCurrentModelIndex(QModelIndex)));
         QObject::connect(ui->danhSachThanhVien->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(checkVt()));
-
-        ui->id->setEnabled(false);
-        ui->tenDangNhap->setEnabled(false);
-
-        QStringList gioitinh=(QStringList()<<"Tất cả"<<"Nam"<<"Nữ");
-        QStringList tinhtrang=(QStringList()<<"Tất cả"<<"Hoạt động"<<"Bị khóa");
-        ui->combo_gioitinh->addItems(gioitinh);
-        ui->combo_tinhtrang->addItems(tinhtrang);
     }
 }
 
@@ -331,23 +336,44 @@ void MainWindow::on_muonButton_clicked()
     if (user_id != 0) {
         // Lấy danh sách đã chọn
         QModelIndexList list = ui->danhMucSach->selectionModel()->selectedRows(0);
-        if (!list.isEmpty()) {
+        // Kiểm tra số lượng sách chờ duyệt hoặc đang mượn
+        int num_borrowed = information->getBorrowedNumOfBook();
+        qDebug() << num_borrowed;
+        if (num_borrowed + list.size() > 2) {
+            QMessageBox::warning(this, "Mượn sách", QString("Bạn chỉ được mượn tối đa 2 cuốn một lúc!\nSố lượng đang mượn/chờ duyệt: %1").arg(num_borrowed));
+            return;
+        }
+        // list không thể trống vì nếu empty thì muonButton sẽ bị vô hiệu hóa, do vậy không cần
+        // kiểm tra xem list có trống hay không
+        for (QModelIndex &index: list) {
+            if (!index.sibling(index.row(), model->fieldIndex("status")).data().toInt()) {
+                QMessageBox::warning(this, "Mượn sách", QString("Một số sách đã chọn không khả dụng!"));
+                return;
+            }
+        }
+        bool ok = true;
+        // Tạo transaction và commit nó nếu không có lỗi
+        if (db.transaction()) {
             QSqlQuery query(0, db);
             query.prepare("INSERT INTO account_book(account_id, book_id, book_status_id) VALUES(?, ?, ?)");
-            bool ok = false;
             for (QModelIndex index: list) {
                 query.addBindValue(user_id);
                 query.addBindValue(index.data().toString());
                 query.addBindValue(1);
-                if (!(ok = query.exec())) {
+                if (!(ok &= query.exec())) {
                     qDebug() << query.lastError();
+                    break;
                 }
             }
-            if (ok) {
-                QMessageBox::information(this, "Mượn sách", "Bạn đã gửi yêu cầu mượn sách!");
-            } else {
-                QMessageBox::warning(this, "Mượn sách", "Đã có lỗi xảy ra!");
-            }
+            ok &= ok ? db.commit() : db.rollback();
+        } else {
+            ok = false;
+        }
+        if (ok) {
+            QMessageBox::information(this, "Mượn sách", "Bạn đã gửi yêu cầu mượn sách!");
+        } else {
+            qDebug() << db.lastError();
+            QMessageBox::warning(this, "Mượn sách", "Đã có lỗi xảy ra!");
         }
     } else {
         on_dangNhapButton_clicked();
@@ -559,12 +585,15 @@ void MainWindow::on_hopThuButton_clicked()
     emit inboxRequest();
 }
 
-void MainWindow::enableButtonsProperly(QItemSelection selected)
+void MainWindow::enableButtonsProperly()
 {
-    if (!selected.indexes().isEmpty()) {
+    QModelIndexList list = ui->danhMucSach->selectionModel()->selectedRows();
+    if (!list.isEmpty()) {
+        ui->hienThiSach->show();
         ui->thayDoiSachButton->setEnabled(true);
         ui->muonButton->setEnabled(true);
     } else {
+        ui->hienThiSach->hide();
         ui->thayDoiSachButton->setEnabled(false);
         ui->muonButton->setEnabled(false);
     }
@@ -649,8 +678,10 @@ void MainWindow::on_xoaButton_clicked()
     query.prepare("delete from account where account_id= :id");
     query.bindValue(":id", ui->id->text());
     bool ms=query.exec();
-    if (ms)
+    if (ms) {
         QMessageBox::about(this,"Xóa tài khoản","Xóa tài khoản thành công!");
+        memberModel->select();
+    }
     else
         QMessageBox::about(this,"Xóa tài khoản","Xóa tài khoản thất bại!");
 }
@@ -707,20 +738,32 @@ void MainWindow::submitVt()
 
 void MainWindow::on_thayDoiButton_clicked()
 {
+
+    QString errorMessage;
+    if (!ui->matKhau->hasAcceptableInput()) {
+        errorMessage += "Mật khẩu phải có ít nhất 10 ký tự";
+    }
+    if (!ui->congViec->hasAcceptableInput()) {
+        errorMessage += "Họ và tên không hợp lệ!\n";
+    }
+    if (!ui->congViec->hasAcceptableInput()) {
+        errorMessage += "Công việc không hợp lệ!\n";
+    }
+    if (!ui->email->hasAcceptableInput()) {
+        errorMessage += "Email không hợp lệ!\n";
+    }
+    if (!ui->CMND->hasAcceptableInput()) {
+        errorMessage += "CMND không hợp lệ";
+    }
+    if (!errorMessage.isEmpty()) {
+        QMessageBox::warning(this, "Không hợp lệ", errorMessage);
+        return;
+    }
+
     memberMapper->submit();
     submitVt();
 
     QSqlQuery query(0,db);
-    qDebug()<<ui->tinhTrang->currentText();
-    qDebug()<<ui->id->text();
-
-    query.prepare("update account set status_id=:tt where account_id=:id");
-    query.bindValue(":tt",(ui->tinhTrang->currentText()=="Hoạt động")? "1" : "2");
-    query.bindValue(":id",ui->id->text());
-
-    query.prepare("update account set gender_id=:gt where account_id=:id");
-    query.bindValue(":gt",ui->gioiTinh->currentText()=="Nam"? "1" : "2");
-    query.bindValue(":id",ui->id->text());
 }
 
 void MainWindow::checkVt() {

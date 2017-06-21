@@ -32,13 +32,21 @@ Inbox::Inbox(QWidget *parent, QSqlDatabase database) :
     ui->hopThuDenTable->setColumnHidden(model->fieldIndex("receiver"), true);
     ui->hopThuDenTable->setColumnHidden(model->fieldIndex("is_read"), true);
     ui->hopThuDenTable->sortByColumn(model->fieldIndex("send_at"), Qt::DescendingOrder);
+    ui->hopThuDenTable->resizeColumnToContents(0);
+    ui->hopThuDenTable->resizeColumnToContents(1);
+    ui->hopThuDenTable->resizeColumnToContents(3);
+    connect(ui->hopThuDenTable->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(handleHienThiTinNhan()));
     ui->hopThuDiTable->setModel(model);
     ui->hopThuDiTable->setItemDelegate(new QSqlRelationalDelegate(this));
     ui->hopThuDiTable->setColumnHidden(model->fieldIndex("message_id"), true);
     ui->hopThuDiTable->setColumnHidden(model->fieldIndex("sender"), true);
     ui->hopThuDiTable->setColumnHidden(model->fieldIndex("is_read"), true);
     ui->hopThuDiTable->setColumnHidden(0, true);
-    ui->hopThuDenTable->sortByColumn(model->fieldIndex("send_at"), Qt::DescendingOrder);
+    ui->hopThuDiTable->sortByColumn(model->fieldIndex("send_at"), Qt::DescendingOrder);
+    ui->hopThuDiTable->resizeColumnToContents(0);
+    ui->hopThuDiTable->resizeColumnToContents(1);
+    ui->hopThuDiTable->resizeColumnToContents(3);
+    connect(ui->hopThuDenTable->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(handleHienThiTinNhan()));
 
     int receiverIdx = model->fieldIndex("receiver");
     int senderIdx = model->fieldIndex("sender");
@@ -47,12 +55,14 @@ Inbox::Inbox(QWidget *parent, QSqlDatabase database) :
     model->select();
     int contentIdx = model->fieldIndex("content");
     int titleIdx = model->fieldIndex("title");
+    int send_atIdx = model->fieldIndex("send_at");
     QDataWidgetMapper *hopThuDenMapper = new QDataWidgetMapper(this);
     hopThuDenMapper->setItemDelegate(new QSqlRelationalDelegate(this));
     hopThuDenMapper->setModel(messageModel);
     hopThuDenMapper->addMapping(ui->loiNhanTextEdit, contentIdx);
     hopThuDenMapper->addMapping(ui->tieuDeLineEdit, titleIdx);
     hopThuDenMapper->addMapping(ui->nguoiGuiLineEdit, senderIdx);
+    hopThuDenMapper->addMapping(ui->thoiGianLineEdit, send_atIdx);
     connect(ui->hopThuDenTable->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), hopThuDenMapper, SLOT(setCurrentModelIndex(QModelIndex)));
     QDataWidgetMapper *hopThuDiMapper = new QDataWidgetMapper(this);
     hopThuDiMapper->setItemDelegate(new QSqlRelationalDelegate(this));
@@ -60,10 +70,14 @@ Inbox::Inbox(QWidget *parent, QSqlDatabase database) :
     hopThuDiMapper->addMapping(ui->loiNhanTextEdit, contentIdx);
     hopThuDiMapper->addMapping(ui->tieuDeLineEdit, titleIdx);
     hopThuDiMapper->addMapping(ui->nguoiGuiLineEdit, receiverIdx);
+    hopThuDiMapper->addMapping(ui->thoiGianLineEdit, send_atIdx);
     connect(ui->hopThuDiTable->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), hopThuDiMapper, SLOT(setCurrentModelIndex(QModelIndex)));
     connect(ui->hopThuDenTable->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(on_messageRead(QModelIndex)));
     ui->nguoiNhan->setModel(model->relationModel(receiverIdx));
     ui->nguoiNhan->setModelColumn(1);
+    ui->hienThiTinNhan->hide();
+
+
 }
 
 bool Inbox::sendMessage(QString username, QString title, QString text)
@@ -164,4 +178,13 @@ void Inbox::on_messageRead(QModelIndex selected)
 void Inbox::on_capNhatButton_clicked()
 {
     model->select();
+}
+
+void Inbox::handleHienThiTinNhan()
+{
+    if (!ui->hopThuDenTable->selectionModel()->selectedRows().isEmpty() || !ui->hopThuDiTable->selectionModel()->selectedRows().isEmpty()) {
+        ui->hienThiTinNhan->show();
+    } else {
+        ui->hienThiTinNhan->hide();
+    }
 }

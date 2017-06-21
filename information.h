@@ -25,19 +25,18 @@ public:
     void checkVt();
     void enableEdit(bool);
     void submitAv();
-
+    // Lấy số lượng sách đã mượn (MainWindow)
+    int getBorrowedNumOfBook();
 private slots:
     void on_hoanTatButton_clicked();
     void on_thayDoiButton_clicked();
     void on_dangNhapThanhCong(int, QString);
-    void on_updateMyBooks(const QModelIndexList& selectedList);
     void on_huyButton_clicked();
     void on_avatarButton_clicked();
     void on_currentIndexChanged(int);
     void on_informationRequest();
     void on_dangXuat();
     void on_matSachButton_clicked();
-
     void on_tabWidget_currentChanged(int index);
 
 signals:

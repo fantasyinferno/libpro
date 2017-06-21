@@ -27,7 +27,6 @@ private slots:
     void on_dangKyButton_clicked();
     void on_avatarButton_clicked();
     void on_formRequest(int tab);
-    void on_iAmYourParent(QWidget*);
 signals:
     void dangNhapThanhCong(int, QString);
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1582</width>
+    <width>772</width>
     <height>657</height>
    </rect>
   </property>
@@ -26,7 +26,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>775</width>
+          <width>370</width>
           <height>540</height>
          </rect>
         </property>
@@ -68,6 +68,9 @@
              <property name="selectionBehavior">
               <enum>QAbstractItemView::SelectRows</enum>
              </property>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
             </widget>
            </item>
           </layout>
@@ -79,7 +82,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>775</width>
+          <width>418</width>
           <height>540</height>
          </rect>
         </property>
@@ -95,6 +98,9 @@
            <property name="selectionBehavior">
             <enum>QAbstractItemView::SelectRows</enum>
            </property>
+           <attribute name="horizontalHeaderStretchLastSection">
+            <bool>true</bool>
+           </attribute>
           </widget>
          </item>
         </layout>
@@ -104,7 +110,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>775</width>
+          <width>418</width>
           <height>540</height>
          </rect>
         </property>
@@ -173,6 +179,13 @@
         </property>
         <property name="placeholderText">
          <string>Người gửi/Người nhận</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="thoiGianLineEdit">
+        <property name="placeholderText">
+         <string>Thời gian</string>
         </property>
        </widget>
       </item>
