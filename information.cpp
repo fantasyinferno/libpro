@@ -178,6 +178,12 @@ void Information::submitAv() {
     }
 }
 
+int Information::getBorrowedNumOfBook()
+{
+    bookModel->setFilter("book_status = 'Đang mượn' OR book_status = 'Chờ duyệt'");
+    return bookModel->rowCount();
+}
+
 //*********************************
 
 

@@ -84,7 +84,7 @@ private slots:
     void enableLibrarianButtons(bool, bool, bool, bool);
     void on_themSachButton_clicked();
     void on_hopThuButton_clicked();
-    void enableButtonsProperly(QItemSelection);
+    void enableButtonsProperly();
     // Kiểm tra vai trò (manager)
     void submitVt();
     void checkVt();

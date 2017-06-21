@@ -25,7 +25,8 @@ public:
     void checkVt();
     void enableEdit(bool);
     void submitAv();
-
+    // Lấy số lượng sách đã mượn (MainWindow)
+    int getBorrowedNumOfBook();
 private slots:
     void on_hoanTatButton_clicked();
     void on_thayDoiButton_clicked();
@@ -37,7 +38,6 @@ private slots:
     void on_informationRequest();
     void on_dangXuat();
     void on_matSachButton_clicked();
-
     void on_tabWidget_currentChanged(int index);
 
 signals:

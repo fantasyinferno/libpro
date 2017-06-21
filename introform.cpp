@@ -33,14 +33,13 @@ void IntroForm::on_pushButton_clicked()
 
     QString st;
     QSqlQuery query(0, db);
-    query.prepare("SELECT account_id, password FROM account WHERE account = :tdn");
+    query.prepare("SELECT account_id, password, status_id FROM account WHERE account = :tdn");
     query.bindValue(":tdn",tdn);
     query.exec();
-
     if (!query.next() || QCryptographicHash::hash(mk.toUtf8(), QCryptographicHash::Sha3_512) != query.value("password").toByteArray()) {
-        qDebug() << QCryptographicHash::hash(mk.toUtf8(), QCryptographicHash::Sha3_512);
-        qDebug() << query.value("password").toByteArray();
         QMessageBox::warning(this,"Không đúng!","Tên đăng nhập hoặc mật khẩu không đúng.");
+    } else if (query.value("status") == 2) {
+        QMessageBox::warning(this, "Bị khóa!", "Tài khoản này đã bị khóa");
     }
     else
     {
@@ -101,6 +100,7 @@ void IntroForm::on_dangKyButton_clicked()
     query.prepare("insert into account(account, password, status_id, fullname, identity_number, gender_id, birthdate, email, job, avatar) values(:tdn, :mk, :tt, :hvt, :cmnd, :gt, :ns, :em, :cv, :av);");
     query.bindValue(":tdn",ui->dk_tdn->text());
     QByteArray passwordByteArray = ui->dk_mk->text().toUtf8();
+    qDebug() << passwordByteArray;
     passwordByteArray = QCryptographicHash::hash(passwordByteArray, QCryptographicHash::Sha3_512);
     qDebug() << passwordByteArray;
     query.bindValue(":mk",passwordByteArray);

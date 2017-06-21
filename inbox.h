@@ -26,6 +26,7 @@ private slots:
     void on_guiButton_clicked();
     void on_messageRead(QModelIndex);
     void on_capNhatButton_clicked();
+    void handleHienThiTinNhan();
 signals:
     void tinNhanMoi(int);
 private:
