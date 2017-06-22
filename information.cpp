@@ -194,7 +194,8 @@ void Information::submitAv() {
 
 int Information::getBorrowedNumOfBook()
 {
-    bookModel->setFilter("(book_status = 'Đang mượn' OR book_status = 'Chờ duyệt') AND account_id = " + user_id);
+    bookModel->setFilter(QString("(book_status = 'Đang mượn' OR book_status = 'Chờ duyệt') AND account_id = %1").arg(user_id));
+    bookModel->select();
     return bookModel->rowCount();
 }
 

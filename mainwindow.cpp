@@ -338,7 +338,6 @@ void MainWindow::on_muonButton_clicked()
         QModelIndexList list = ui->danhMucSach->selectionModel()->selectedRows(0);
         // Kiểm tra số lượng sách chờ duyệt hoặc đang mượn
         int num_borrowed = information->getBorrowedNumOfBook();
-        qDebug() << num_borrowed;
         if (num_borrowed + list.size() > 2) {
             QMessageBox::warning(this, "Mượn sách", QString("Bạn chỉ được mượn tối đa 2 cuốn một lúc!\nSố lượng đang mượn/chờ duyệt: %1").arg(num_borrowed));
             return;
@@ -615,54 +614,45 @@ void MainWindow::on_thanhTimKiem_2_returnPressed()
 
 
 //    QString type = ui->luaChon->text();
-    QString keyword = ui->thanhTimKiem->text();
+    QString keyword = ui->thanhTimKiem_2->text();
 
-    QString s="";
-
+    QString andString;
+    if (ui->combo_gioitinh->currentText()!="Tất cả")
+    {
+        andString += QString("gender = %1 AND ").arg(ui->combo_gioitinh->currentText());
+    }
+    if (ui->combo_tinhtrang->currentText()!="Tất cả")
+    {
+        andString += QString("status = %1 AND ").arg(ui->combo_tinhtrang->currentText());
+    }
+    QString orString;
     if (ui->f_id->isChecked())
     {
-        qDebug()<<"id='"+keyword+"'";
-        model->setFilter("account_id="+keyword);
-        return;
+        orString += "account_id LIKE '%%1%' OR ";
     }
 
     if (ui->f_tendangnhap->isChecked())
     {
-        s=s+((s=="")? "(" : " OR ")+"account LIKE " + ((keyword=="")? "'%'" : "'%%1%'");
+        orString += "account LIKE '%%1%%' OR ";
     }
 
     if (ui->f_hovaten->isChecked())
     {
-        s=s+((s=="")? "(" : " OR ")+"fullname LIKE " + ((keyword=="")? "'%'" : "'%%1%'");
+        orString += "fullname LIKE '%%1%' OR ";
     }
 
     if (ui->f_cmnd->isChecked())
     {
-        s=s+((s=="")? "(" : " OR ")+"identity_number LIKE " + ((keyword=="")? "'%'" : "'%%1%'");
+        orString += "identity_number LIKE '%%1%' OR ";
     }
 
-    s=s+((s=="")? "" : ") ");
-
-    if (ui->combo_gioitinh->currentText()!="Tất cả")
-    {
-        s=s+((s=="")? "" : " AND ")+"gender='"+ui->combo_gioitinh->currentText()+"'";
-    }
-
-    if (ui->combo_tinhtrang->currentText()!="Tất cả")
-    {
-        s=s+((s=="")? "" : " AND ")+"status='"+ui->combo_tinhtrang->currentText()+"'";
-    }
-    if (s=="")
-    {
-        model->setFilter("");
-        return;
-    }
-
-    if (keyword!="")
-        s=s.arg(keyword);
-    qDebug()<<s;
-    model->setFilter(s);
-
+    // Magic
+    andString += andString.isEmpty() ? "1" : andString + "1";
+    orString = orString.isEmpty() ? "1" : orString + "0";
+    QString s = QString("%1 AND (%2)").arg(andString, orString);
+    memberModel->setFilter(keyword.isEmpty() ? "" : s.arg(keyword));
+    qDebug() << memberModel->filter();
+    memberModel->select();
 }
 
 void MainWindow::on_xoaButton_clicked()

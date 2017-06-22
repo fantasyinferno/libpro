@@ -22,12 +22,13 @@ IntroForm::IntroForm(QWidget *parent, QSqlDatabase database) :
     ui->setupUi(this);
     this->setModal(true);
     db = database;
-    QRegExp tdnReg("^[a-zA-Z-_\.0-9]{5,25}$");
+    QRegExp tdnReg("^[a-z-_\\.0-9]{5,25}$");
     QRegExp mkReg(".{10,}");
     QRegExp emReg("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}\\b");
     QRegExp hvtReg("^([^0-9]+)$");
     QRegExp cvReg(".+");
     QRegExp cmndReg("^([0-9]{9}|[0-9]{12})$");
+    ui->dn_tdn->setValidator(new QRegExpValidator(tdnReg, this));
     ui->dk_tdn->setValidator(new QRegExpValidator(tdnReg, this));
     ui->dk_mk->setValidator(new QRegExpValidator(mkReg));
     ui->dk_em->setValidator(new QRegExpValidator(emReg, this));
@@ -98,7 +99,7 @@ void IntroForm::on_dangKyButton_clicked()
         errorMessage += "Tên đăng nhập không hợp lệ (tên đăng nhập chỉ gồm các ký tự bảng chữ cái, số và các ký tự ., _, - và có độ dài từ 5 đến 25 ký tự)\n";
     }
     if (!ui->dk_mk->hasAcceptableInput()) {
-        errorMessage += "Mật khẩu phải có ít nhất 10 ký tự";
+        errorMessage += "Mật khẩu phải có ít nhất 10 ký tự\n";
     }
     if (!ui->dk_hvt->hasAcceptableInput()) {
         errorMessage += "Họ và tên không hợp lệ!\n";
@@ -110,11 +111,11 @@ void IntroForm::on_dangKyButton_clicked()
         errorMessage += "Email không hợp lệ!\n";
     }
     if (!ui->dk_cmnd->hasAcceptableInput()) {
-        errorMessage += "CMND không hợp lệ";
+        errorMessage += "CMND không hợp lệ\n";
     }
     if (ui->dk_mk->text()!=ui->dk_nlmk->text())
     {
-        errorMessage += "Mật khẩu nhập lại không đúng!\n";
+        errorMessage += "Mật khẩu nhập lại không đúng!";
     }
     if (!errorMessage.isEmpty()) {
         QMessageBox::warning(this, "Không hợp lệ!", errorMessage);
