@@ -19,7 +19,7 @@ AddBook::AddBook(QWidget *parent, QSqlDatabase database) :
     // Thiết lập cơ sở dữ liệu
     db = database;
     // Thiết lập query
-    QRegExp isbnReg("(^[A-Z0-9][10]$)|(^[A-Z0-9][13]$)");
+    QRegExp isbnReg("(^[A-Z0-9]{10}$)|(^[A-Z0-9]{13}$)");
     QRegExp titleReg(".+");
     QRegExp authorReg("^([^0-9]+)$");
     QRegExp yearReg("^[1-9][0-9]{1,3}$");

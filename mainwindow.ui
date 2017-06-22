@@ -215,7 +215,7 @@ color: white;
 }</string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="sachPage">
          <property name="enabled">
@@ -1412,6 +1412,9 @@ color: red;</string>
                 <property name="text">
                  <string>Tên đăng nhập</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
@@ -1419,12 +1422,18 @@ color: red;</string>
                 <property name="text">
                  <string>Họ và tên</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QCheckBox" name="f_cmnd">
                 <property name="text">
                  <string>CMND</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
