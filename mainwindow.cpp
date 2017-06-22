@@ -518,7 +518,6 @@ void MainWindow::on_thayDoiSachButton_clicked()
     ui->maSach->setReadOnly(false);
     ui->namSanXuat->setReadOnly(false);
     ui->tacGia->setReadOnly(false);
-    ui->theLoai->setReadOnly(false);
     ui->tuaDe->setReadOnly(false);
     ui->noiDungSach->setReadOnly(false);
     ui->tinhTrangSach->setEnabled(true);
@@ -537,7 +536,6 @@ void MainWindow::on_chapNhanSachButton_clicked()
     ui->maSach->setReadOnly(true);
     ui->namSanXuat->setReadOnly(true);
     ui->tacGia->setReadOnly(true);
-    ui->theLoai->setReadOnly(true);
     ui->tuaDe->setReadOnly(true);
     ui->noiDungSach->setReadOnly(true);
     ui->tinhTrangSach->setEnabled(false);
@@ -552,7 +550,6 @@ void MainWindow::on_huySachButton_clicked()
     ui->maSach->setReadOnly(true);
     ui->namSanXuat->setReadOnly(true);
     ui->tacGia->setReadOnly(true);
-    ui->theLoai->setReadOnly(true);
     ui->tuaDe->setReadOnly(true);
     ui->noiDungSach->setReadOnly(true);
     ui->thayDoiSachButton->show();
