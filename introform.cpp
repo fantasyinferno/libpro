@@ -158,6 +158,7 @@ void IntroForm::on_dangKyButton_clicked()
     }
     if(ok){
         QMessageBox::about(this,"Đăng ký thành công","Đăng ký tài khoản thành công");
+        emit dangNhapThanhCong(id, ui->dk_tdn->text());
         // Reset form đăng ký
         ui->dk_cmnd->clear();
         ui->dk_cv->clear();
@@ -174,7 +175,6 @@ void IntroForm::on_dangKyButton_clicked()
         ui->dk_vt_reader->setChecked(false);
         ui->avatar->setPixmap(QPixmap(":media/images/default.png"));
         this->close();
-        emit dangNhapThanhCong(id, ui->dk_tdn->text());
     }
     else{
         QMessageBox::about(this,"Lỗi","Không tạo được tài khoản");
