@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS quotes;
-CREATE TABLE quotes(quote CHAR(255), author CHAR(255));
+CREATE TABLE quotes(quote VARCHAR(255), author VARCHAR(255));
 INSERT INTO quotes VALUES("Một người không đọc sách chẳng hơn gì kẻ không biết đọc.", "Mark Twain"),
 ("Sách hay, cũng như bạn tốt, ít và được chọn lựa; chọn lựa càng nhiều, thưởng thức càng nhiều.", "Louisa May Alcott"),
 ("Một cuốn sách hay trên giá sách là một người bạn dù quay lưng lại nhưng vẫn là bạn tốt.", "Khuyết danh"), 
