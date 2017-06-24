@@ -16,6 +16,11 @@
   <property name="windowTitle">
    <string>IntroForm</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">#IntroForm {
+	background-color: #495057;
+}</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_6">
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -26,6 +31,11 @@
       <bool>true</bool>
      </property>
      <widget class="QWidget" name="tab">
+      <property name="styleSheet">
+       <string notr="true">#tab {
+	background-color: #e9ecef;
+}</string>
+      </property>
       <attribute name="title">
        <string>Đăng nhập</string>
       </attribute>
@@ -139,6 +149,11 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tab_2">
+      <property name="styleSheet">
+       <string notr="true">#tab_2 {
+	background-color: #e9ecef;
+}</string>
+      </property>
       <attribute name="title">
        <string>Đăng ký</string>
       </attribute>

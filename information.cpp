@@ -69,7 +69,6 @@ Information::Information(QWidget *parent, QSqlDatabase database) :
     mapper->addMapping(ui->ip_em, model->fieldIndex("email"));
     mapper->addMapping(ui->ip_ns, model->fieldIndex("birthdate"));
     connect(mapper, SIGNAL(currentIndexChanged(int)), this, SLOT(on_currentIndexChanged(int)));
-
     // Thiết lập model xử lý lược sử mượn sách
     bookModel = new QSqlRelationalTableModel(this);
     bookModel->setTable("account_book");
@@ -224,6 +223,7 @@ void Information::on_hoanTatButton_clicked()
         enableEdit(false);
         mapper->submit();
         submitVt();
+        mapper->toFirst();
     } else {
         QMessageBox::warning(this, "Không hợp lệ", errorMessage);
     }
