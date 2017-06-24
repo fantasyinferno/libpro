@@ -420,12 +420,18 @@
                <property name="text">
                 <string>Hủy</string>
                </property>
+               <property name="default">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
              <item>
               <widget class="QPushButton" name="hoanTatButton">
                <property name="text">
                 <string>Hoàn tất</string>
+               </property>
+               <property name="default">
+                <bool>false</bool>
                </property>
                <property name="flat">
                 <bool>false</bool>

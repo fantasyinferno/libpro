@@ -103,13 +103,15 @@ Information::~Information()
 }
 
 void Information::checkVt() {
+    ui->ip_vt_reader->setChecked(false);
+    ui->ip_vt_librarian->setChecked(false);
+    ui->ip_vt_manager->setChecked(false);
     QSqlQuery query(0, db);
 
 
     query.prepare("SELECT role_id FROM account_role WHERE account_id = :id");
     query.bindValue(":id", user_id);
     query.exec();
-
     while (query.next()) {
         int role = query.value(0).toInt();
         if (role == 1) {

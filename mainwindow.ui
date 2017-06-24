@@ -975,6 +975,13 @@ color: black;</string>
                  </widget>
                 </item>
                 <item>
+                 <widget class="QPushButton" name="managerAvatarButton">
+                  <property name="text">
+                   <string>Thay đổi avatar</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_20">
                   <item>
                    <widget class="QPushButton" name="thayDoiButton">
@@ -1145,6 +1152,9 @@ color: black;</string>
                     </item>
                     <item>
                      <widget class="QCheckBox" name="reader">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>90</width>

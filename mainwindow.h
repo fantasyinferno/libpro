@@ -93,6 +93,7 @@ private slots:
     void on_timKiemButton_2_clicked();
     // Kiểm tra tin nhắn mới
     void on_tinNhanMoi(int);
+    void on_managerAvatarButton_clicked();
 };
 
 

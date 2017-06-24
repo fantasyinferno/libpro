@@ -14,6 +14,7 @@
 #include <QByteArray>
 #include <QSqlRelation>
 #include <QSqlRelationalTableModel>
+#include <QFileDialog>
 #include "addbook.h"
 #include "finedialog.h"
 #include "accountdelegate.h"
@@ -791,5 +792,15 @@ void MainWindow::checkVt() {
         } else{
             ui->manager->setChecked(true);
         }
+    }
+}
+
+void MainWindow::on_managerAvatarButton_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Image Files (*.png *.jpg *.bmp)"));
+    if (!fileName.isEmpty()) {
+         QPixmap pixmap(fileName);
+         pixmap = pixmap.scaled(180, 180);
+         ui->avatar->setPixmap(pixmap);
     }
 }
