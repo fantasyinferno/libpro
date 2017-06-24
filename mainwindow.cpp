@@ -506,6 +506,17 @@ void MainWindow::on_xacNhanSachDaTraButton_clicked()
         for (QModelIndex &i: list) {
             requestBookModel->setData(i, 3);
         }
+        for (QModelIndex &i: list) {
+            // Lấy id của yêu cầu trước khi xóa
+            int request_id = i.sibling(i.row(), 0).data().toInt();
+            QString username = i.sibling(i.row(), accountIdIdx).data().toString();
+            QString bookName = i.sibling(i.row(), bookIdIdx).data().toString();
+            // Gửi tin nhắn đến thành viên
+            QString text = QString("Thư viện xác nhận bạn đã trả sách %1!").arg(bookName);
+            QString title = QString("LIBPRO - Trả sách #%1: Đã xác nhận trả sách!").arg(request_id);
+            inbox->sendMessage(username, title, text);
+        }
+        requestBookModel->submitAll();
         requestBookModel->select();
         QMessageBox::information(this, "Thành công!", "Bạn đã xác nhận sách đã trả!");
         // Gửi tin nhắn đến thành viên

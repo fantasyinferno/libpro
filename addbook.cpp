@@ -91,7 +91,7 @@ void AddBook::on_changeCoverButton_clicked()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Image Files (*.png *.jpg *.bmp)"));
     if (!fileName.isEmpty()) {
         QPixmap pixmap(fileName);
-        pixmap.scaled(128, 128);
+        pixmap = pixmap.scaled(128, 128);
         ui->cover->setPixmap(pixmap);
     }
 }
