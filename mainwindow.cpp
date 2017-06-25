@@ -83,6 +83,8 @@ void MainWindow::on_thanhTimKiem_returnPressed()
     if (!keyword.isEmpty()) {
         QString queryString = QString("book MATCH 'title:%1 OR author:%1 OR description:%1 OR book_id:%1'").arg(keyword);
         model->setFilter(queryString);
+    } else {
+        model->setFilter("");
     }
 }
 void MainWindow::initializeDatabase(QSqlDatabase database = QSqlDatabase()) {
@@ -571,14 +573,11 @@ void MainWindow::on_huySachButton_clicked()
 void MainWindow::on_themSachButton_clicked()
 {
     AddBook *addBook = new AddBook(0, db);
-    qDebug() << addBook->isModal();
     addBook->setModal(true);
-    qDebug() << addBook->isModal();
     addBook->setWindowTitle("Thêm sách");
     // Tự động giải phóng bộ nhớ sau khi tắt
     addBook->setAttribute(Qt::WA_DeleteOnClose);
     addBook->show();
-    qDebug() << addBook->isModal();
     addBook->raise();
     // Cập nhật lại model nếu có sách mới thêm vào
     QObject::connect(addBook, SIGNAL(accepted()), model, SLOT(select()));
@@ -631,11 +630,11 @@ void MainWindow::on_thanhTimKiem_2_returnPressed()
     QString andString;
     if (ui->combo_gioitinh->currentText()!="Tất cả")
     {
-        andString += QString("gender = %1 AND ").arg(ui->combo_gioitinh->currentText());
+        andString += QString("gender LIKE '%1' AND ").arg(ui->combo_gioitinh->currentText());
     }
     if (ui->combo_tinhtrang->currentText()!="Tất cả")
     {
-        andString += QString("status = %1 AND ").arg(ui->combo_tinhtrang->currentText());
+        andString += QString("status LIKE '%1' AND ").arg(ui->combo_tinhtrang->currentText());
     }
     QString orString;
     if (ui->f_id->isChecked())
@@ -659,11 +658,10 @@ void MainWindow::on_thanhTimKiem_2_returnPressed()
     }
 
     // Magic
-    andString += andString.isEmpty() ? "1" : andString + "1";
+    andString = andString.isEmpty() ? "1" : andString + "1";
     orString = orString.isEmpty() ? "1" : orString + "0";
     QString s = QString("%1 AND (%2)").arg(andString, orString);
     memberModel->setFilter(keyword.isEmpty() ? "" : s.arg(keyword));
-    qDebug() << memberModel->filter();
     memberModel->select();
 }
 
@@ -698,7 +696,7 @@ void MainWindow::submitVt()
     query.prepare("delete from account_role where account_id = :id;");
     query.bindValue(":id", id);
     query.exec();
-    bool ms;
+    bool ms = true;
     // TODO: replace account's name with it's id. Connect checkboxes to the model.
     if (ui->librarian->isChecked())
     {

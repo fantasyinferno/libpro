@@ -127,7 +127,6 @@ void Inbox::on_dangNhapThanhCong(int id, QString username)
     user = username;
     model->setFilter(QString("is_read = 0 AND receiver = %1").arg(user_id));
     model->select();
-    qDebug() << model->rowCount();
     emit tinNhanMoi(model->rowCount());
     on_toolBox_currentChanged(ui->toolBox->currentIndex());
 

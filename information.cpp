@@ -143,7 +143,7 @@ void Information::submitVt()
     query.prepare("delete from account_role where account_id = :id;");
     query.bindValue(":id", id);
     query.exec();
-    bool ms;
+    bool ms = true;
     // TODO: replace account's name with it's id. Connect checkboxes to the model.
     if (ui->ip_vt_librarian->isChecked())
     {
